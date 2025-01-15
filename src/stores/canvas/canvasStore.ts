@@ -1,7 +1,7 @@
 import { CanvasEditMode } from '@/models/canvas'
 import { RootStore } from '@/stores/rootStore'
 import { makeAutoObservable } from 'mobx'
-import { Color, Fog, Object3D, Vector3 } from 'three'
+import { Color, Object3D, Vector3 } from 'three'
 
 export const DEFAULT_COLOR = 0xffffff
 
@@ -12,6 +12,12 @@ export class CanvasStore {
 
   setCurrentMode(mode: CanvasEditMode) {
     this.currentMode = mode
+  }
+
+  selectedObject: Object3D | undefined = undefined
+
+  setSelectedObject(object: Object3D) {
+    this.selectedObject = object
   }
 
   /* light settings */

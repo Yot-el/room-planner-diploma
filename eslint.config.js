@@ -47,7 +47,8 @@ export default tseslint.config(
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
       'react/no-unknown-property': [0],
-      'react/jsx-first-prop-new-line': 'multiline'
+      'react/jsx-first-prop-new-line': ['error', 'multiline'],
+      '@typescript-eslint/unbound-method': ['off']
     },
   },
 )
