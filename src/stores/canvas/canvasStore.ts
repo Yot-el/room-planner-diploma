@@ -1,22 +1,40 @@
+import { CanvasEditMode } from '@/models/canvas'
 import { RootStore } from '@/stores/rootStore'
 import { makeAutoObservable } from 'mobx'
+import { Color, Fog, Object3D, Vector3 } from 'three'
+
+export const DEFAULT_COLOR = 0xffffff
 
 export class CanvasStore {
   rootStore: RootStore
 
-  /* camera settings */
-  fov = 75
-  near = 0.1
-  far = 100
-  aspect = 0
+  currentMode: CanvasEditMode = CanvasEditMode.Camera
 
-  updateAspect(width: number, height: number) {
-    this.aspect = width / height
+  setCurrentMode(mode: CanvasEditMode) {
+    this.currentMode = mode
   }
+
+  /* light settings */
+  lightColor = new Color(DEFAULT_COLOR)
+  lightIntensity = 1
+
+  directionalLightPosition = new Vector3(1, 1, 0)
+  directionalLightTarget = new Object3D()
+
+  setDirectionalLightTargetPosition(x: number, y: number, z: number) {
+    this.directionalLightTarget.position.set(x, y, z)
+  }
+
+  /* scene fog */
+  fogColor = new Color(DEFAULT_COLOR)
+
+  /* scene ground */
+  groundColor = new Color(DEFAULT_COLOR)
 
   constructor(rootStore: RootStore) {
     makeAutoObservable(this, {}, { autoBind: true })
-
     this.rootStore = rootStore
+
+    this.directionalLightTarget.position.set(0, 0, 0)
   }
 }

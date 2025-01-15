@@ -8,21 +8,27 @@ import react from 'eslint-plugin-react'
 export default tseslint.config(
   { ignores: ['dist'] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    settings: { react: { version: '18.3' } },
+    extends: [
+      js.configs.recommended, 
+      ...tseslint.configs.recommendedTypeChecked
+    ],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
+      globals: globals.browser,
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
         },
-      },
-      globals: globals.browser,
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      }
     },
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
-      'react': react
+      react
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -37,7 +43,11 @@ export default tseslint.config(
       'indent': ['error', 2],
       'no-trailing-spaces': ['error', { 'ignoreComments': true }],
       '@typescript-eslint/no-unused-vars': ['warn'],
-      'react-hooks/exhaustive-deps': ['off']
+      'react-hooks/exhaustive-deps': ['off'],
+      ...react.configs.recommended.rules,
+      ...react.configs['jsx-runtime'].rules,
+      'react/no-unknown-property': [0],
+      'react/jsx-first-prop-new-line': 'multiline'
     },
   },
 )
