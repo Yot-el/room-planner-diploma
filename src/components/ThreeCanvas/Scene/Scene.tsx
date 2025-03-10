@@ -1,17 +1,18 @@
 import SceneGround from '@/components/ThreeCanvas/SceneGround/SceneGround'
 import { CanvasEditMode } from '@/models/canvas'
+import { ObjectType } from '@/models/three'
 import { DEFAULT_COLOR } from '@/stores/canvas/canvasStore'
 import { useStores } from '@/utils/hooks/useStores'
 import { OrbitControls, TransformControls } from '@react-three/drei'
-import { ThreeEvent, useThree } from '@react-three/fiber'
+import { ThreeEvent, useLoader, useThree } from '@react-three/fiber'
 import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useRef } from 'react'
-import { Color, DirectionalLight } from 'three'
+import { Color, DirectionalLight, Object3D } from 'three'
 
 const Scene: FC = () => {
   const {
     canvasStore: {
-      lightColor, lightIntensity, directionalLightPosition, directionalLightTarget, fogColor, currentMode, selectedObject, setSelectedObject
+      lightColor, lightIntensity, directionalLightPosition, directionalLightTarget, fogColor, currentMode, selectedObject, setSelectedObject, sceneObjects, setSceneObject
     }
   } = useStores()
 
@@ -22,9 +23,9 @@ const Scene: FC = () => {
   const isTransformControlsEnabled = currentMode === CanvasEditMode.Selection
   const isTransformControlsAxisEnabled = isTransformControlsEnabled && !!selectedObject
 
-  const onObjectClick = (event: ThreeEvent<MouseEvent>) => {
+  const onObjectClick = (id: string, event: ThreeEvent<MouseEvent>) => {
     if (isTransformControlsEnabled) {
-      setSelectedObject(event.object)
+      setSelectedObject(id)
     }
   }
 
@@ -34,10 +35,11 @@ const Scene: FC = () => {
 
   return <>
     <ambientLight color={lightColor} intensity={lightIntensity} />
-    <mesh onClick={onObjectClick}>
-      <boxGeometry args={[2, 2, 2]} />
-      <meshStandardMaterial color={0x049ef4} />
-    </mesh>
+    {
+      Object.entries(sceneObjects).map(([id, item]) => (
+        <primitive key={id} object={item.object} onClick={(event: ThreeEvent<MouseEvent>) => onObjectClick(id, event)} />
+      ))
+    }
     <SceneGround />
     <directionalLight
       color={lightColor}
@@ -50,8 +52,8 @@ const Scene: FC = () => {
       lightRef.current &&
       <directionalLightHelper args={[lightRef.current, 1]} />
     }
-    <OrbitControls enabled={isOrbitControlsEnabled} />
-    <TransformControls object={selectedObject} enabled={isTransformControlsEnabled} showX={isTransformControlsAxisEnabled} showY={isTransformControlsAxisEnabled} showZ={isTransformControlsAxisEnabled} mode="translate" />
+    <OrbitControls enabled={isOrbitControlsEnabled} maxPolarAngle={Math.PI / 2 - 0.01} />
+    <TransformControls object={selectedObject} enabled={isTransformControlsEnabled} showX={isTransformControlsAxisEnabled} showY={false} showZ={isTransformControlsAxisEnabled} mode="translate" />
     <fog attach="fog" color={fogColor} near={0.0025} far={250} />
   </>
 }
