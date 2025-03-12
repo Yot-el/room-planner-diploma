@@ -1,5 +1,6 @@
 import { CanvasEditMode } from '@/models/canvas'
 import { ObjectType } from '@/models/three'
+import { Tooltip, TooltipData, TooltipType } from '@/models/tooltip'
 import { RootStore } from '@/stores/rootStore'
 import { makeAutoObservable, reaction } from 'mobx'
 import { Color, Object3D, Vector3 } from 'three'
@@ -46,6 +47,13 @@ export class CanvasStore {
       return
     }
     this.selectedObject = this.sceneObjects[id].object
+  }
+
+  /* tooltip */
+  tooltip: Tooltip | null = null
+
+  setTooltip(value: Tooltip | null) {
+    this.tooltip = value
   }
 
   /* light settings */

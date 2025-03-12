@@ -6,7 +6,11 @@ import { RootProvider } from '@/utils/hooks/useStores'
 function App() {
   return (
     <RootProvider>
-      <ThreeCanvas />
+      <div
+        style={{height: '100%',
+          width: '100%'}}>
+        <ThreeCanvas />
+      </div>
       <Toolbar />
       <LeftPanel />
     </RootProvider>

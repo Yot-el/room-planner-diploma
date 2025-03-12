@@ -1,5 +1,6 @@
 import { CanvasEditMode } from '@/models/canvas'
 import { ObjectType } from '@/models/three'
+import { TooltipType } from '@/models/tooltip'
 import { useStores } from '@/utils/hooks/useStores'
 import { ThreeEvent } from '@react-three/fiber'
 import { observer } from 'mobx-react-lite'
@@ -8,6 +9,8 @@ import { BoxGeometry, Euler, Mesh, Vector3 } from 'three'
 
 const SCENE_SIZE = 1000
 const GRID_SIZE = SCENE_SIZE / 10
+const WALL_WIDTH = 0.5
+const WALL_HEIGHT = 3
 
 const DEFAULT_TENTATIVE_WALL = {
   startPoint: new Vector3(0, 0, 0),
@@ -19,18 +22,23 @@ const SceneGround: FC = () => {
     canvasStore: {
       groundColor,
       currentMode,
-      setSceneObject
+      setSceneObject,
+      setTooltip
     }
   } = useStores()
 
+  const handleClick = (event: ThreeEvent<MouseEvent>) => {
+    if (currentMode === CanvasEditMode.BuildWall && tentativeWall === DEFAULT_TENTATIVE_WALL) {
+      startDrawTentativeWall(event)
+    } else clearTentativeWall()
+  }
+
   const startDrawTentativeWall = (event: ThreeEvent<MouseEvent>) => {
-    if (currentMode === CanvasEditMode.BuildWall) {
-      const startPointPosition = new Vector3(event.point.x, 0, event.point.z)
-      setTentativeWall({
-        startPoint: startPointPosition,
-        endPoint: startPointPosition
-      })
-    }
+    const startPointPosition = new Vector3(event.point.x, 0, event.point.z)
+    setTentativeWall({
+      startPoint: startPointPosition,
+      endPoint: startPointPosition
+    })
   }
 
   const moveTentativeWall = (event: ThreeEvent<MouseEvent>) => {
@@ -41,10 +49,23 @@ const SceneGround: FC = () => {
           endPoint: wallEndPoint})
         meshTentativeWallRef.current?.lookAt(wallEndPoint)
 
-        const tentativeWallSize = tentativeWall.startPoint.distanceTo(tentativeWall.endPoint) > 0.01 ? new Vector3(0.5, 3, tentativeWall.startPoint.distanceTo(tentativeWall.endPoint)) : new Vector3(0, 0, 0)
+        const isWallSmall = !(tentativeWall.startPoint.distanceTo(tentativeWall.endPoint) > 0.01)
+        const tentativeWallSize = !isWallSmall ? new Vector3(WALL_WIDTH, WALL_HEIGHT, tentativeWall.startPoint.distanceTo(tentativeWall.endPoint)) : new Vector3(0, 0, 0)
         const geometry = new BoxGeometry(...tentativeWallSize.toArray())
         geometry.translate(0, tentativeWallSize.y / 2, tentativeWallSize.z / 2)
         meshTentativeWallRef.current.geometry = geometry
+
+        if (!isWallSmall) {
+          setTooltip({
+            type: TooltipType.WALL,
+            data: {
+              width: tentativeWallSize.x,
+              height: tentativeWallSize.y,
+              length: tentativeWallSize.z
+            },
+            position: wallEndPoint
+          })
+        }
       }
     }
   }
@@ -60,6 +81,7 @@ const SceneGround: FC = () => {
 
         meshTentativeWallRef.current.geometry = new BoxGeometry(0, 0, 0)
       }
+      setTooltip(null)
       setTentativeWall(DEFAULT_TENTATIVE_WALL)
     }
   }
@@ -72,9 +94,8 @@ const SceneGround: FC = () => {
       position={[0, 0, 0]}
       rotation={[Math.PI / -2, 0, 0]}
       receiveShadow={true}
-      onPointerDown={startDrawTentativeWall}
+      onClick={handleClick}
       onPointerMove={moveTentativeWall}
-      onPointerUp={clearTentativeWall}
     >
       <planeGeometry args={[SCENE_SIZE, SCENE_SIZE]} />
       <meshLambertMaterial color={groundColor} />

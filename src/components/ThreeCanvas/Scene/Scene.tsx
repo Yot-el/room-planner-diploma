@@ -1,4 +1,5 @@
 import SceneGround from '@/components/ThreeCanvas/SceneGround/SceneGround'
+import ThreeTooltip from '@/components/ThreeCanvas/ThreeTooltip/ThreeTooltip'
 import { CanvasEditMode } from '@/models/canvas'
 import { ObjectType } from '@/models/three'
 import { DEFAULT_COLOR } from '@/stores/canvas/canvasStore'
@@ -54,6 +55,7 @@ const Scene: FC = () => {
     }
     <OrbitControls enabled={isOrbitControlsEnabled} maxPolarAngle={Math.PI / 2 - 0.01} />
     <TransformControls object={selectedObject} enabled={isTransformControlsEnabled} showX={isTransformControlsAxisEnabled} showY={false} showZ={isTransformControlsAxisEnabled} mode="translate" />
+    <ThreeTooltip />
     <fog attach="fog" color={fogColor} near={0.0025} far={250} />
   </>
 }
