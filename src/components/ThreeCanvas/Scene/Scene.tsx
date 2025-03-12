@@ -5,10 +5,17 @@ import { ObjectType } from '@/models/three'
 import { DEFAULT_COLOR } from '@/stores/canvas/canvasStore'
 import { useStores } from '@/utils/hooks/useStores'
 import { OrbitControls, TransformControls } from '@react-three/drei'
-import { ThreeEvent, useLoader, useThree } from '@react-three/fiber'
+import { Canvas, ThreeEvent, useLoader, useThree } from '@react-three/fiber'
 import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useRef } from 'react'
 import { Color, DirectionalLight, Object3D } from 'three'
+
+const getTransformControlsMode = (mode: CanvasEditMode) => {
+  if (mode === CanvasEditMode.Translate) return 'translate'
+  if (mode === CanvasEditMode.Rotate) return 'rotate'
+
+  return 'translate'
+}
 
 const Scene: FC = () => {
   const {
@@ -21,7 +28,8 @@ const Scene: FC = () => {
   const lightRef = useRef<DirectionalLight | null>(null)
 
   const isOrbitControlsEnabled = currentMode === CanvasEditMode.Camera
-  const isTransformControlsEnabled = currentMode === CanvasEditMode.Selection
+  const isTransformControlsEnabled = [CanvasEditMode.Rotate, CanvasEditMode.Translate].includes(currentMode)
+  console.log(isTransformControlsEnabled)
   const isTransformControlsAxisEnabled = isTransformControlsEnabled && !!selectedObject
 
   const onObjectClick = (id: string, event: ThreeEvent<MouseEvent>) => {
@@ -54,7 +62,14 @@ const Scene: FC = () => {
       <directionalLightHelper args={[lightRef.current, 1]} />
     }
     <OrbitControls enabled={isOrbitControlsEnabled} maxPolarAngle={Math.PI / 2 - 0.01} />
-    <TransformControls object={selectedObject} enabled={isTransformControlsEnabled} showX={isTransformControlsAxisEnabled} showY={false} showZ={isTransformControlsAxisEnabled} mode="translate" />
+    <TransformControls
+      object={selectedObject}
+      enabled={isTransformControlsEnabled}
+      showX={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate}
+      showY={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Rotate}
+      showZ={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate}
+      mode={getTransformControlsMode(currentMode)}
+    />
     <ThreeTooltip />
     <fog attach="fog" color={fogColor} near={0.0025} far={250} />
   </>

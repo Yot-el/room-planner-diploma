@@ -81,7 +81,7 @@ export class CanvasStore {
 
     reaction(() => this.selectedObject,
       () => {
-        if (!this.selectedObject && this.currentMode === CanvasEditMode.Selection) {
+        if (!this.selectedObject && [CanvasEditMode.Rotate, CanvasEditMode.Translate].includes(this.currentMode)) {
           this.setCurrentMode(CanvasEditMode.Camera)
         }
       })

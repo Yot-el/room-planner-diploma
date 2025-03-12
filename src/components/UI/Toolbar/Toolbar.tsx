@@ -4,17 +4,20 @@ import { useStores } from '@/utils/hooks/useStores'
 import { Box, IconButton, Stack, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { FC } from 'react'
-import { AdsClick } from '@mui/icons-material'
-import { ControlCamera } from '@mui/icons-material'
+import { SwipeVertical, ControlCamera, Rotate90DegreesCcw } from '@mui/icons-material'
 
 const CanvasModes = {
   [CanvasEditMode.Camera]: {
-    title: 'Камера',
+    title: 'Перемещение камеры',
+    icon: <SwipeVertical />
+  },
+  [CanvasEditMode.Translate]: {
+    title: 'Перемещение объекта',
     icon: <ControlCamera />
   },
-  [CanvasEditMode.Selection]: {
-    title: 'Выбор объекта',
-    icon: <AdsClick />
+  [CanvasEditMode.Rotate]: {
+    title: 'Вращение объекта',
+    icon: <Rotate90DegreesCcw />
   }
 }
 

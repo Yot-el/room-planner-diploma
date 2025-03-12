@@ -1,5 +1,6 @@
 export enum CanvasEditMode {
-  Camera = 'Camera',
-  Selection = 'Selection',
-  BuildWall = 'BuildWall'
+  Camera = 'camera',
+  Translate = 'translate',
+  Rotate = 'rotate',
+  BuildWall = 'buildWall'
 }
