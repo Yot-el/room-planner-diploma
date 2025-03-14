@@ -1,5 +1,5 @@
 import { CanvasEditMode } from '@/models/canvas'
-import { ObjectType } from '@/models/three'
+import { ObjectType, Wall} from '@/models/three'
 import { Tooltip, TooltipData, TooltipType } from '@/models/tooltip'
 import { RootStore } from '@/stores/rootStore'
 import { makeAutoObservable, reaction } from 'mobx'
@@ -21,6 +21,33 @@ export class CanvasStore {
     type: ObjectType
   }> = {}
 
+  get sceneObjectsByType() {
+    const types = {
+      [ObjectType.MODEL]: {} as Record<string, Object3D>,
+      [ObjectType.WALL]: {} as Record<string, Wall>,
+      [ObjectType.WINDOW]: {} as Record<string, Window>
+    }
+
+    Object.entries(this.sceneObjects).forEach(([id, sceneObject]) => {
+      const group = types[sceneObject.type]
+      group[id] = sceneObject.object
+    })
+
+    return types
+  }
+
+  get walls() {
+    return this.sceneObjectsByType[ObjectType.WALL]
+  }
+
+  get models() {
+    return this.sceneObjectsByType[ObjectType.MODEL]
+  }
+
+  get windows() {
+    return this.sceneObjectsByType[ObjectType.WINDOW]
+  }
+
   setSceneObject(id: string, object: Object3D, type: ObjectType) {
     this.sceneObjects[id] = { object,
       type }
@@ -32,21 +59,33 @@ export class CanvasStore {
   }
 
   deleteSceneObject(id: string) {
+    const objectToDelete = this.sceneObjects[id]
     // Если удаляемый объект выбран, то убираем его
-    if (this.sceneObjects[id].object === this.selectedObject) {
+    if (objectToDelete.object === this.selectedObject?.object) {
       this.setSelectedObject()
     }
+
+    // Удаляем окна у удаляемой стены
+    if (objectToDelete.type === ObjectType.WALL) {
+      objectToDelete.object.children.forEach((child) => {
+        this.deleteSceneObject(child.uuid)
+      })
+    }
+
     delete this.sceneObjects[id]
   }
 
-  selectedObject: Object3D | undefined = undefined
+  selectedObject: {
+    object: Object3D
+    type: ObjectType
+  } | undefined = undefined
 
   setSelectedObject(id?: string) {
     if (!id) {
       this.selectedObject = undefined
       return
     }
-    this.selectedObject = this.sceneObjects[id].object
+    this.selectedObject = this.sceneObjects[id]
   }
 
   /* tooltip */
@@ -83,6 +122,13 @@ export class CanvasStore {
       () => {
         if (!this.selectedObject && [CanvasEditMode.Rotate, CanvasEditMode.Translate].includes(this.currentMode)) {
           this.setCurrentMode(CanvasEditMode.Camera)
+        }
+      })
+
+    reaction(() => this.currentMode,
+      (current) => {
+        if (![CanvasEditMode.Rotate, CanvasEditMode.Translate].includes(current)) {
+          this.setSelectedObject()
         }
       })
   }

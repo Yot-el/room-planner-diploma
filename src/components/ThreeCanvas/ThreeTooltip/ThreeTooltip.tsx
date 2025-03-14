@@ -1,10 +1,13 @@
-import { RotationTooltip, TooltipType, WallTooltip } from '@/models/tooltip'
+import { RotationTooltipProps, TooltipType, WallTooltipProps, ContextMenuTooltipProps, TooltipData } from '@/models/tooltip'
 import { useStores } from '@/utils/hooks/useStores'
-import { Box, Paper, Stack } from '@mui/material'
+import { Box, IconButton, Paper, Stack, Tooltip } from '@mui/material'
 import { Html } from '@react-three/drei'
 import { observer } from 'mobx-react-lite'
 import { FC } from 'react'
 import { styled } from '@mui/material/styles'
+import WallTooltip from '@/components/ThreeCanvas/ThreeTooltip/tooltips/WallTooltip'
+import RotationTooltip from '@/components/ThreeCanvas/ThreeTooltip/tooltips/RotationTooltip'
+import ContextMenuTooltip from '@/components/ThreeCanvas/ThreeTooltip/tooltips/ContextMenuTooltip'
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -18,15 +21,19 @@ const Item = styled(Paper)(({ theme }) => ({
   padding: '5px'
 }))
 
-const getTooltipTextByType = (type: TooltipType, data: WallTooltip | RotationTooltip) => {
+const getTooltipTextByType = (type: TooltipType, data: TooltipData) => {
   switch (type) {
   case TooltipType.WALL: {
-    const info = data as WallTooltip
-    return <Stack>
-      <Box sx={{ textWrap: 'nowrap' }}>{`Ширина: ${info.width}м`}</Box>
-      <Box sx={{ textWrap: 'nowrap' }}>{`Высота: ${info.height}м`}</Box>
-      <Box sx={{ textWrap: 'nowrap' }}>{`Длина: ${info.length.toFixed(2)}м`}</Box>
-    </Stack>
+    const info = data as WallTooltipProps
+    return <WallTooltip {...info}/>
+  }
+  case TooltipType.ROTATE: {
+    const info = data as RotationTooltipProps
+    return <RotationTooltip {...info} />
+  }
+  case TooltipType.CONTEXT_MENU: {
+    const info = data as ContextMenuTooltipProps
+    return <ContextMenuTooltip {...info} />
   }
   }
 }

@@ -9,7 +9,7 @@ import { BoxGeometry, Euler, Mesh, Vector3 } from 'three'
 
 const SCENE_SIZE = 1000
 const GRID_SIZE = SCENE_SIZE / 10
-const WALL_WIDTH = 0.5
+export const WALL_WIDTH = 0.5
 const WALL_HEIGHT = 3
 
 const DEFAULT_TENTATIVE_WALL = {
@@ -77,7 +77,8 @@ const SceneGround: FC = () => {
         const wallClone = meshTentativeWallRef.current.clone(true)
         wallClone.position.set(...wallPosition.toArray())
 
-        if (tentativeWall.startPoint.distanceTo(tentativeWall.endPoint) > 0.01) setSceneObject(wallClone.uuid, wallClone, ObjectType.WALL)
+        const isWallSmall = tentativeWall.startPoint.distanceTo(tentativeWall.endPoint) <= 0.01
+        if (!isWallSmall) setSceneObject(wallClone.uuid, wallClone, ObjectType.WALL)
 
         meshTentativeWallRef.current.geometry = new BoxGeometry(0, 0, 0)
       }
