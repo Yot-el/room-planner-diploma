@@ -2,8 +2,18 @@ import ThreeCanvas from '@/components/ThreeCanvas/ThreeCanvas'
 import LeftPanel from '@/components/UI/LeftPanel/LeftPanel'
 import Toolbar from '@/components/UI/Toolbar/Toolbar'
 import { RootProvider } from '@/utils/hooks/useStores'
+import { useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router'
 
 function App() {
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    // Редирект на каталог
+    if (pathname === '/') navigate('/catalogue')
+  }, [ pathname ])
+
   return (
     <RootProvider>
       <div

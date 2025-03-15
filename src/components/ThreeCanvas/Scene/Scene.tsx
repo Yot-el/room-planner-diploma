@@ -9,7 +9,7 @@ import { DEFAULT_COLOR } from '@/stores/canvas/canvasStore'
 import { quaternionToDegree } from '@/utils/helpers/helpers'
 import { useStores } from '@/utils/hooks/useStores'
 import { OrbitControls, TransformControls } from '@react-three/drei'
-import { Canvas, ThreeEvent, useLoader, useThree } from '@react-three/fiber'
+import { ThreeEvent, useThree } from '@react-three/fiber'
 import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useRef } from 'react'
 import { Color, DirectionalLight, Vector3 } from 'three'
@@ -134,7 +134,9 @@ const Scene: FC = () => {
       object={selectedObject?.object}
       enabled={isTransformControlsEnabled}
       showX={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate && selectedObject.type !== ObjectType.WINDOW}
-      showY={isTransformControlsAxisEnabled && (currentMode === CanvasEditMode.Rotate || selectedObject.type === ObjectType.WINDOW)}
+      showY={isTransformControlsAxisEnabled &&
+        ((currentMode === CanvasEditMode.Rotate && selectedObject.type !== ObjectType.WINDOW) ||
+        (currentMode === CanvasEditMode.Translate && selectedObject.type === ObjectType.WINDOW))}
       showZ={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate}
       mode={getTransformControlsMode(currentMode)}
       onObjectChange={onSelectedObjectChange}

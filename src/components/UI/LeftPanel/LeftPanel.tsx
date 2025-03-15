@@ -1,30 +1,32 @@
 import { Box, Stack, Tab, Tabs } from '@mui/material'
 import { FC, useState } from 'react'
 import { Chair, AccountTree, Handyman } from '@mui/icons-material'
-import SceneTree from '@/components/UI/LeftPanel/TabPanels/SceneTree/SceneTree'
-import Catalogue from '@/components/UI/LeftPanel/TabPanels/Catalogue/Catalogue'
-import Tools from '@/components/UI/LeftPanel/TabPanels/Tools/Tools'
+import { Outlet, useLocation } from 'react-router'
+import { useNavigate } from 'react-router'
 
 const tabs = [
   {
     label: 'Каталог',
     icon: <Chair />,
-    tabPanel: <Catalogue />
+    link: '/catalogue'
   },
   {
     label: 'Сцена',
     icon: <AccountTree />,
-    tabPanel: <SceneTree />
+    link: '/scene-graph'
   },
   {
     label: 'Построить',
     icon: <Handyman />,
-    tabPanel: <Tools />
+    link: '/tools'
   }
 ]
 
 const LeftPanel: FC = () => {
-  const [activeTab, setActiveTab] = useState(0)
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+  // eslint-disable-next-line no-useless-escape
+  const currentPath = pathname.match(/^\/[^\/]+/)?.[0]
 
   return <Stack
     sx={{
@@ -39,14 +41,31 @@ const LeftPanel: FC = () => {
       boxShadow: '10px 10px 30px -24px rgba(0,0,0,0.75);'
     }}
     spacing={1} >
-    <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue as number)} variant="fullWidth" >
-      {
-        tabs.map((tab, index) => (<Tab key={index} label={tab.label} icon={tab.icon} />))
-      }
-    </Tabs>
-    <Box flexGrow={1}>
-      { tabs[activeTab].tabPanel }
-    </Box>
+    {
+      currentPath &&
+        <>
+          <Tabs
+            value={currentPath}
+            onChange={(e, newValue) => {
+              navigate(newValue as string)
+            }}
+            variant="fullWidth"
+          >
+            {
+              tabs.map((tab, index) => (
+                <Tab
+                  key={index}
+                  label={tab.label}
+                  icon={tab.icon}
+                  value={tab.link}
+                />))
+            }
+          </Tabs>
+          <Box flexGrow={1}>
+            <Outlet />
+          </Box>
+        </>
+    }
   </Stack>
 }
 
