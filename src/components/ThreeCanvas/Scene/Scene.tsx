@@ -95,7 +95,9 @@ const Scene: FC = () => {
   }, [])
 
   return <>
-    <ambientLight color={lightColor} intensity={lightIntensity} />
+    <ambientLight
+      color={lightColor}
+      intensity={lightIntensity} />
     {
       Object.entries(models).map(([id, item]) => (
         <primitive
@@ -128,7 +130,9 @@ const Scene: FC = () => {
       lightRef.current &&
       <directionalLightHelper args={[lightRef.current, 1]} />
     }
-    <OrbitControls enabled={isOrbitControlsEnabled} maxPolarAngle={Math.PI / 2 - 0.01} />
+    <OrbitControls
+      enabled={isOrbitControlsEnabled}
+      maxPolarAngle={Math.PI / 2 - 0.01} />
     <TransformControls
       object={selectedObject?.object}
       enabled={isTransformControlsEnabled}
@@ -143,7 +147,11 @@ const Scene: FC = () => {
       space={selectedObject?.type === ObjectType.WINDOW ? 'local' : 'world'}
     />
     <ThreeTooltip />
-    <fog attach="fog" color={fogColor} near={0.0025} far={250} />
+    <fog
+      attach="fog"
+      color={fogColor}
+      near={0.0025}
+      far={250} />
   </>
 }
 

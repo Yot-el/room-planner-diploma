@@ -16,12 +16,22 @@ const SceneTree: FC = () => {
   } = useStores()
   const navigate = useNavigate()
 
-  return <Stack spacing={1} height="100%">
-    <Stack spacing={1} flexGrow={1}>
+  return <Stack
+    spacing={1}
+    height="100%">
+    <Stack
+      spacing={1}
+      flexGrow={1}>
       <SimpleTreeView>
-        <TreeItem itemId="models" label="Модели" disabled={!Object.keys(models).length}>
+        <TreeItem
+          itemId="models"
+          label="Модели"
+          disabled={!Object.keys(models).length}>
         </TreeItem>
-        <TreeItem itemId="walls" label="Стены" disabled={!Object.keys(walls).length}>
+        <TreeItem
+          itemId="walls"
+          label="Стены"
+          disabled={!Object.keys(walls).length}>
           {
             Object.values(walls).map((wall) => (
               <TreeItem
@@ -35,7 +45,9 @@ const SceneTree: FC = () => {
         </TreeItem>
       </SimpleTreeView>
     </Stack>
-    <Button onClick={clearSceneObjects} variant="contained">
+    <Button
+      onClick={clearSceneObjects}
+      variant="contained">
       Очистить сцену
     </Button>
   </Stack>

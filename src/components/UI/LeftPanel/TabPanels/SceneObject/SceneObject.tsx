@@ -35,10 +35,15 @@ const SceneObject = () => {
     return <></>
   }
 
-  return <Stack spacing={1} height="100%">
+  return <Stack
+    spacing={1}
+    height="100%">
     <Typography>{getWallShortName(sceneObject.object.uuid)}</Typography>
     {isObjectWall(sceneObject.type, sceneObject.object) &&
-      <MuiColorInput format="hex" value={wallColor(sceneObject.object.uuid) ?? ''} onChange={changeColor} />
+      <MuiColorInput
+        format="hex"
+        value={wallColor(sceneObject.object.uuid) ?? ''}
+        onChange={changeColor} />
     }
   </Stack>
 }

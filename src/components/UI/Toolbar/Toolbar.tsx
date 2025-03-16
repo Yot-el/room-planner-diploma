@@ -41,7 +41,9 @@ const Toolbar: FC = () => {
     {
       (Object.entries(CanvasModes) as Entries<typeof CanvasModes>)
         .map(([mode, { title, icon }], index) => (
-          <Box key={index} onClick={() => setCurrentMode(mode)}>
+          <Box
+            key={index}
+            onClick={() => setCurrentMode(mode)}>
             <Tooltip title={title}>
               <IconButton color={ mode === currentMode ? 'warning' : 'primary' }>
                 { icon }

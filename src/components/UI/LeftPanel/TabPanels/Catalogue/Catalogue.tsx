@@ -27,10 +27,15 @@ const Catalogue: FC = () => {
   }
 
   return  <Stack spacing={1}>
-    <ImageList cols={1} rowHeight={150}>
+    <ImageList
+      cols={1}
+      rowHeight={150}>
       {
         objects.map((object, index) => (
-          <ImageListItem key={index} onClick={() => { void loadObjectToScene(object.type, object.url) }} sx={{ cursor: 'pointer' }}>
+          <ImageListItem
+            key={index}
+            onClick={() => { loadObjectToScene(object.type, object.url) }}
+            sx={{ cursor: 'pointer' }}>
             <img
               src={object.imageUrl}
               alt={object.name}

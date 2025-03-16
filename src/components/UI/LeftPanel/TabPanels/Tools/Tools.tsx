@@ -22,7 +22,9 @@ const Tools: FC = () => {
   }, [currentMode])
 
   return <Stack spacing={1}>
-    <Button onClick={() => setCurrentMode(CanvasEditMode.BuildWall)} variant="contained">
+    <Button
+      onClick={() => setCurrentMode(CanvasEditMode.BuildWall)}
+      variant="contained">
       Построить стену
     </Button>
   </Stack>

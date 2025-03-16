@@ -49,22 +49,32 @@ const ContextMenuTooltip: FC<ContextMenuTooltipProps> = ({ objectId }) => {
     setCurrentMode(CanvasEditMode.Camera)
   }
 
-  return <Stack spacing={1} sx={{ width: 'max-content' }}>
+  return <Stack
+    spacing={1}
+    sx={{ width: 'max-content' }}>
     <Box alignSelf="end">
-      <IconButton onClick={() => setTooltip(null)} size="small">
+      <IconButton
+        onClick={() => setTooltip(null)}
+        size="small">
         <Close />
       </IconButton>
     </Box>
     {
       sceneObject.type === ObjectType.WALL &&
       <Box>
-        <Button onClick={createWindow} variant="contained" startIcon={<Window />}>
+        <Button
+          onClick={createWindow}
+          variant="contained"
+          startIcon={<Window />}>
         Построить окно
         </Button>
       </Box>
     }
     <Box>
-      <Button onClick={deleteObject} variant="contained" startIcon={<Delete />}>
+      <Button
+        onClick={deleteObject}
+        variant="contained"
+        startIcon={<Delete />}>
         Удалить объект
       </Button>
     </Box>

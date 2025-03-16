@@ -102,10 +102,14 @@ const SceneGround: FC = () => {
       <planeGeometry args={[SCENE_SIZE, SCENE_SIZE]} />
       <meshLambertMaterial color={groundColor} />
     </mesh>
-    <mesh ref={meshTentativeWallRef} position={tentativeWall.startPoint}>
+    <mesh
+      ref={meshTentativeWallRef}
+      position={tentativeWall.startPoint}>
       <meshStandardMaterial />
     </mesh>
-    <gridHelper visible={true} args={[GRID_SIZE, GRID_SIZE]} />
+    <gridHelper
+      visible={true}
+      args={[GRID_SIZE, GRID_SIZE]} />
   </>
 }
 
