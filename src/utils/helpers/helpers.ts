@@ -14,3 +14,5 @@ export const quaternionToDegree = (quaternion: Quaternion) => {
     z: +MathUtils.radToDeg(r_z).toFixed(2)
   }
 }
+
+export const getWallShortName = (uuid: string) => `Стена ${uuid.toString().slice(0, 5)}`

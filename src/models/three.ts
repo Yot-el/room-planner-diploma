@@ -1,4 +1,4 @@
-import { BoxGeometry, Mesh, MeshPhongMaterial, Object3D } from 'three'
+import { BoxGeometry, Mesh, MeshPhongMaterial, MeshStandardMaterial, Object3D } from 'three'
 
 export enum ModelType {
   FBX = 'fbx',
@@ -11,7 +11,7 @@ export enum ObjectType {
   MODEL = 'model'
 }
 
-export type Wall = Mesh<BoxGeometry, MeshPhongMaterial>
+export type Wall = Mesh<BoxGeometry, MeshStandardMaterial>
 
 export type Window = Mesh<BoxGeometry, MeshPhongMaterial>
 

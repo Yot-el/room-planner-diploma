@@ -5,7 +5,7 @@ import { useStores } from '@/utils/hooks/useStores'
 import { ThreeEvent } from '@react-three/fiber'
 import { observer } from 'mobx-react-lite'
 import { FC, useRef, useState } from 'react'
-import { BoxGeometry, Euler, Mesh, Vector3 } from 'three'
+import { BoxGeometry, Mesh, MeshStandardMaterial, Vector3 } from 'three'
 
 const SCENE_SIZE = 1000
 const GRID_SIZE = SCENE_SIZE / 10
@@ -88,7 +88,7 @@ const SceneGround: FC = () => {
   }
 
   const [tentativeWall, setTentativeWall] = useState(DEFAULT_TENTATIVE_WALL)
-  const meshTentativeWallRef = useRef<Mesh | null>(null)
+  const meshTentativeWallRef = useRef<Mesh<BoxGeometry, MeshStandardMaterial> | null>(null)
 
   return <>
     <mesh
@@ -102,7 +102,7 @@ const SceneGround: FC = () => {
       <meshLambertMaterial color={groundColor} />
     </mesh>
     <mesh ref={meshTentativeWallRef} position={tentativeWall.startPoint}>
-      <meshPhongMaterial shininess={0}/>
+      <meshStandardMaterial />
     </mesh>
     <gridHelper visible={true} args={[GRID_SIZE, GRID_SIZE]} />
   </>

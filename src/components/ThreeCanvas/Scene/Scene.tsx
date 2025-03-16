@@ -36,7 +36,6 @@ const Scene: FC = () => {
   const isTransformControlsAxisEnabled = isTransformControlsEnabled && !!selectedObject
 
   const onObjectClick = (event: ThreeEvent<MouseEvent>) => {
-    event.stopPropagation()
     if (isTransformControlsEnabled) {
       const objectId = event.eventObject.uuid
       const nearestObjectClicked = event.intersections[0].object

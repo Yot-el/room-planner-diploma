@@ -40,6 +40,24 @@ export class CanvasStore {
     return this.sceneObjectsByType[ObjectType.WALL]
   }
 
+  setWallColor(id: string, color: string) {
+    const wall = this.walls[id]
+
+    if (!wall) return
+    wall.material.color.setStyle(color)
+    // mobx не реагирует на изменение только цвета стены
+    this.setSceneObject(id, wall, ObjectType.WALL)
+  }
+
+  get wallColor() {
+    return (id: string) => {
+      const wall = this.walls[id]
+
+      if (!wall) return
+      return wall.material.color.getHexString()
+    }
+  }
+
   get models() {
     return this.sceneObjectsByType[ObjectType.MODEL]
   }
