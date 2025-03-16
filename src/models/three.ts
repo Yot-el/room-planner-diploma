@@ -2,7 +2,8 @@ import { BoxGeometry, Mesh, MeshPhongMaterial, MeshStandardMaterial, Object3D } 
 
 export enum ModelType {
   FBX = 'fbx',
-  OBJ = 'obj'
+  OBJ = 'obj',
+  GLTF = 'gltf'
 }
 
 export enum ObjectType {

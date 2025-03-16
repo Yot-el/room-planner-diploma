@@ -1,8 +1,7 @@
-import { OBJLoader } from 'three/addons/loaders/OBJLoader.js'
-import { MTLLoader } from 'three/addons/loaders/MTLLoader.js'
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js'
-import { BufferGeometry, Mesh, MeshPhongMaterial, NormalBufferAttributes, Object3D } from 'three'
+import { Object3D } from 'three'
 import { ModelType } from '@/models/three'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 export const loadModel = (type: ModelType, url: string): Promise<Object3D> => new Promise((resolve, reject) => {
   switch (type) {
@@ -18,6 +17,13 @@ export const loadModel = (type: ModelType, url: string): Promise<Object3D> => ne
   }
   case ModelType.OBJ: {
     reject(new Error('Unsupported model type'))
+    break
+  }
+  case ModelType.GLTF: {
+    const loader = new GLTFLoader()
+    loader.load(url, (gltf) => {
+      resolve(gltf.scene.children[0])
+    })
     break
   }
   default: {

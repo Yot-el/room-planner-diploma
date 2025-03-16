@@ -2,14 +2,24 @@ import { CanvasEditMode } from '@/models/canvas'
 import { useStores } from '@/utils/hooks/useStores'
 import { Button, Stack } from '@mui/material'
 import { observer } from 'mobx-react-lite'
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 
-const SceneTree: FC = () => {
+const Tools: FC = () => {
   const {
     canvasStore: {
+      currentMode,
       setCurrentMode
     }
   } = useStores()
+
+  useEffect(() => {
+    // При переходе на другую страницу сбрасываем режим
+    return () => {
+      if (currentMode === CanvasEditMode.BuildWall) {
+        setCurrentMode(CanvasEditMode.Camera)
+      }
+    }
+  }, [currentMode])
 
   return <Stack spacing={1}>
     <Button onClick={() => setCurrentMode(CanvasEditMode.BuildWall)} variant="contained">
@@ -18,4 +28,4 @@ const SceneTree: FC = () => {
   </Stack>
 }
 
-export default observer(SceneTree)
+export default observer(Tools)

@@ -76,6 +76,7 @@ const SceneGround: FC = () => {
         const wallPosition = meshTentativeWallRef.current?.getWorldPosition(new Vector3())
         const wallClone = meshTentativeWallRef.current.clone(true)
         wallClone.position.set(...wallPosition.toArray())
+        wallClone.material = wallClone.material.clone()
 
         const isWallSmall = tentativeWall.startPoint.distanceTo(tentativeWall.endPoint) <= 0.01
         if (!isWallSmall) setSceneObject(wallClone.uuid, wallClone, ObjectType.WALL)
