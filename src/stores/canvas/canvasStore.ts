@@ -115,7 +115,7 @@ export class CanvasStore {
 
   /* light settings */
   lightColor = new Color(DEFAULT_COLOR)
-  lightIntensity = 10
+  lightIntensity = 2
 
   directionalLightPosition = new Vector3(3, 10, 10)
   directionalLightTarget = new Object3D()
