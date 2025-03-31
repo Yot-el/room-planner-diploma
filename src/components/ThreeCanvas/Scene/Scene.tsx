@@ -24,7 +24,7 @@ const getTransformControlsMode = (mode: CanvasEditMode) => {
 const Scene: FC = () => {
   const {
     canvasStore: {
-      lightColor, lightIntensity, directionalLightPosition, directionalLightTarget, fogColor, currentMode, selectedObject, setSelectedObject, sceneObjects, setTooltip, walls, models
+      lightColor, lightIntensity, directionalLightPosition, directionalLightTarget, fogColor, currentMode, selectedObject, setSelectedObject, sceneObjects, setTooltip, walls, models, setSceneObject
     }
   } = useStores()
 
@@ -76,6 +76,10 @@ const Scene: FC = () => {
 
         selectedObject.object.position.clamp(new Vector3(0, -WINDOW_HEIGHT / 2, 0), maxPosition)
       }
+
+      const { x, y, z } = selectedObject.object.position
+      selectedObject.object.position.set(+x.toFixed(4), +y.toFixed(4), +z.toFixed(4))
+      setSceneObject(selectedObject.object.uuid, selectedObject.object, selectedObject.type)
     }
 
     if (currentMode === CanvasEditMode.Rotate) {
@@ -139,7 +143,7 @@ const Scene: FC = () => {
       showX={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate && selectedObject.type !== ObjectType.WINDOW}
       showY={isTransformControlsAxisEnabled &&
         ((currentMode === CanvasEditMode.Rotate && selectedObject.type !== ObjectType.WINDOW) ||
-        (currentMode === CanvasEditMode.Translate && selectedObject.type === ObjectType.WINDOW))}
+        (currentMode === CanvasEditMode.Translate && selectedObject.type !== ObjectType.WALL))}
       showZ={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate}
       mode={getTransformControlsMode(currentMode)}
       onObjectChange={onSelectedObjectChange}
