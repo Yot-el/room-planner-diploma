@@ -1,6 +1,6 @@
 import TexturePicker from '@/components/UI/TexturePicker/TexturePicker'
 import { isObjectWall, ObjectType, Wall } from '@/models/three'
-import { getModelShortName, getWallShortName } from '@/utils/helpers/helpers'
+import { getModelShortName, getWallShortName, quaternionToDegree } from '@/utils/helpers/helpers'
 import { loadTexture } from '@/utils/helpers/loadTexture'
 import { useStores } from '@/utils/hooks/useStores'
 import { Stack, TextField, Typography } from '@mui/material'
@@ -8,7 +8,7 @@ import { observer } from 'mobx-react-lite'
 import { MuiColorInput } from 'mui-color-input'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { RepeatWrapping } from 'three'
+import { MathUtils, RepeatWrapping, Vector3 } from 'three'
 
 const SceneObject = () => {
   const {
@@ -40,6 +40,11 @@ const SceneObject = () => {
     setSceneObject(sceneObject.object.uuid, sceneObject.object, sceneObject.type)
   }
 
+  const changeRotation = (degree: number) => {
+    sceneObject.object.setRotationFromAxisAngle(new Vector3(0, 1, 0), MathUtils.degToRad(degree))
+    setSceneObject(sceneObject.object.uuid, sceneObject.object, sceneObject.type)
+  }
+
   const changeTexture = async (value: string) => {
     if (isObjectWall(sceneObject.type, sceneObject.object)) {
       const texture = await loadTexture(value)
@@ -60,7 +65,13 @@ const SceneObject = () => {
   return <Stack
     spacing={2}
     height="100%">
-    <Typography>{isObjectWall(sceneObject.type, sceneObject.object) ? getWallShortName(sceneObject.object.uuid) : getModelShortName(sceneObject.object.uuid, sceneObject.object.userData.name as string)}</Typography>
+    <Typography
+      variant='h6'
+    >
+      {isObjectWall(sceneObject.type, sceneObject.object) ?
+        getWallShortName(sceneObject.object.uuid) :
+        getModelShortName(sceneObject.object.uuid, sceneObject.object.userData.name as string)}
+    </Typography>
     {isObjectWall(sceneObject.type, sceneObject.object) &&
     <>
       <MuiColorInput
@@ -93,6 +104,17 @@ const SceneObject = () => {
         type="number"
         value={sceneObject.object.position.z}
         onChange={(e) => changePosition(sceneObject.object.position.x, sceneObject.object.position.y, +e.target.value)}
+      />
+      <TextField
+        label="Угол поворота"
+        type="number"
+        value={quaternionToDegree(sceneObject.object.quaternion).y}
+        onChange={(e) => changeRotation(+e.target.value)}
+        slotProps={{
+          htmlInput: {
+            step: 10
+          }
+        }}
       />
     </Stack>
   </Stack>

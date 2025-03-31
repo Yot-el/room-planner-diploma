@@ -84,6 +84,7 @@ const Scene: FC = () => {
 
     if (currentMode === CanvasEditMode.Rotate) {
       const degrees = quaternionToDegree(selectedObject.object.quaternion)
+      setSceneObject(selectedObject.object.uuid, selectedObject.object, selectedObject.type)
       setTooltip({
         type: TooltipType.ROTATE,
         data: {

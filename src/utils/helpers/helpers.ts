@@ -2,7 +2,7 @@ import { Euler, MathUtils, Quaternion } from 'three'
 
 export const quaternionToDegree = (quaternion: Quaternion) => {
   const euler = new Euler()
-  const radians = euler.setFromQuaternion(quaternion)
+  const radians = euler.setFromQuaternion(quaternion, 'YXZ')
 
   const r_x = radians.x > 0 ? radians.x : (2 * Math.PI) + radians.x
   const r_y = radians.y > 0 ? radians.y : (2 * Math.PI) + radians.y

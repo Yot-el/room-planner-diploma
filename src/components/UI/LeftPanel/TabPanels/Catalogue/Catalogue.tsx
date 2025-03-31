@@ -20,6 +20,9 @@ const Catalogue: FC = () => {
 
   const loadObjectToScene = async (type: ModelType, url: string, name: string) => {
     const object = await loadModel(type, url)
+
+    const { x, y, z } = object.position
+    object.position.set(+x.toFixed(4), +y.toFixed(4), +z.toFixed(4))
     object.userData.name = name
     setSceneObject(object.uuid, object, ObjectType.MODEL)
   }

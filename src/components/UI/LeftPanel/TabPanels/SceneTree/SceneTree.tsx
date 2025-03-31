@@ -54,6 +54,9 @@ const SceneTree: FC = () => {
                 itemId={wall.uuid}
                 label={getWallShortName(wall.uuid)}
                 onClick={() => { navigate(`${wall.uuid}`) }}
+                sx={selectedObject?.object.uuid === wall.uuid ? {
+                  color: 'warning.main'
+                } : {}}
               />
             ))
           }
