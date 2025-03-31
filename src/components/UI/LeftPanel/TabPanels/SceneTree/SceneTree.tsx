@@ -1,4 +1,4 @@
-import { getWallShortName } from '@/utils/helpers/helpers'
+import { getModelShortName, getWallShortName } from '@/utils/helpers/helpers'
 import { useStores } from '@/utils/hooks/useStores'
 import { Button, Stack } from '@mui/material'
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view'
@@ -27,6 +27,16 @@ const SceneTree: FC = () => {
           itemId="models"
           label="Модели"
           disabled={!Object.keys(models).length}>
+          {
+            Object.values(models).map((model) => (
+              <TreeItem
+                key={model.uuid}
+                itemId={model.uuid}
+                label={getModelShortName(model.uuid, model.userData?.name as string)}
+                onClick={() => { navigate(`${model.uuid}`) }}
+              />
+            ))
+          }
         </TreeItem>
         <TreeItem
           itemId="walls"

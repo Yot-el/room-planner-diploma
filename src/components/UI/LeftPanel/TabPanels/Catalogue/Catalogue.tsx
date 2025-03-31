@@ -1,52 +1,69 @@
 import { ModelType, ObjectType } from '@/models/three'
 import { loadModel } from '@/utils/helpers/loadModel'
 import { useStores } from '@/utils/hooks/useStores'
-import { ImageList, ImageListItem, Stack } from '@mui/material'
+import { ImageList, ImageListItem, Pagination, Stack } from '@mui/material'
 import { observer } from 'mobx-react-lite'
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 
 const Catalogue: FC = () => {
   const {
     canvasStore: {
       setSceneObject
+    },
+    catalogueStore: {
+      items,
+      pageCount,
+      changePage,
+      page
     }
   } = useStores()
 
-  const objects = [
-    {
-      url: './models/couch.fbx',
-      imageUrl: './images/couch.png',
-      name: 'couch',
-      type: ModelType.FBX
-    }
-  ]
-
-  const loadObjectToScene = async (type: ModelType, url: string) => {
+  const loadObjectToScene = async (type: ModelType, url: string, name: string) => {
     const object = await loadModel(type, url)
+    object.userData.name = name
     setSceneObject(object.uuid, object, ObjectType.MODEL)
   }
 
-  return  <Stack spacing={1}>
+  useEffect(() => {
+    if (!items.length) {
+      changePage(1)
+    }
+  }, [])
+
+  return  <Stack
+    spacing={1}
+    height="100%"
+    padding={1}
+    alignItems="center"
+  >
     <ImageList
       cols={1}
-      rowHeight={150}>
+      rowHeight="auto"
+      sx={{ flexGrow: 1 }}>
       {
-        objects.map((object, index) => (
+        items.map((item) => (
           <ImageListItem
-            key={index}
-            onClick={() => { loadObjectToScene(object.type, object.url) }}
+            key={item.id}
+            onClick={() => { loadObjectToScene(ModelType.GLTF, item.src, item.properties.name) }}
             sx={{ cursor: 'pointer' }}>
             <img
-              src={object.imageUrl}
-              alt={object.name}
+              src={''}
+              alt={item.properties.name}
               width="200"
-              height="200"
+              height="20"
               loading="lazy"
             />
           </ImageListItem>
         ))
       }
     </ImageList>
+    <Pagination
+      count={pageCount}
+      page={page}
+      color="primary"
+      size="small"
+      onChange={(_, page) => changePage(page)}
+    />
   </Stack>
 }
 

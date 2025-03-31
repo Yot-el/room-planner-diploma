@@ -1,6 +1,6 @@
 import TexturePicker from '@/components/UI/TexturePicker/TexturePicker'
 import { isObjectWall, ObjectType, Wall } from '@/models/three'
-import { getWallShortName } from '@/utils/helpers/helpers'
+import { getModelShortName, getWallShortName } from '@/utils/helpers/helpers'
 import { loadTexture } from '@/utils/helpers/loadTexture'
 import { useStores } from '@/utils/hooks/useStores'
 import { Stack, Typography } from '@mui/material'
@@ -56,7 +56,7 @@ const SceneObject = () => {
   return <Stack
     spacing={1}
     height="100%">
-    <Typography>{getWallShortName(sceneObject.object.uuid)}</Typography>
+    <Typography>{isObjectWall(sceneObject.type, sceneObject.object) ? getWallShortName(sceneObject.object.uuid) : getModelShortName(sceneObject.object.uuid, sceneObject.object.userData.name as string)}</Typography>
     {isObjectWall(sceneObject.type, sceneObject.object) &&
     <>
       <MuiColorInput

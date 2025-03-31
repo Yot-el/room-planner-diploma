@@ -12,13 +12,25 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} >
-          <Route path="catalogue" element={<Catalogue />} />
-          <Route path="scene-graph" element={<Outlet />}>
-            <Route index element={<SceneTree />} />
-            <Route path=":objectId" element={<SceneObject />} />
+        <Route
+          path="/"
+          element={<App />} >
+          <Route
+            path="catalogue"
+            element={<Catalogue />} />
+          <Route
+            path="scene-graph"
+            element={<Outlet />}>
+            <Route
+              index
+              element={<SceneTree />} />
+            <Route
+              path=":objectId"
+              element={<SceneObject />} />
           </Route>
-          <Route path="tools" element={<Tools />} />
+          <Route
+            path="tools"
+            element={<Tools />} />
         </Route>
       </Routes>
     </BrowserRouter>
