@@ -17,3 +17,5 @@ export type Wall = Mesh<BoxGeometry, MeshStandardMaterial>
 export type Window = Mesh<BoxGeometry, MeshPhongMaterial>
 
 export const isObjectWall = (type: ObjectType, object: Object3D): object is Wall => type === ObjectType.WALL
+
+export const isObjectWindow = (type: ObjectType, object: Object3D): object is Window => type === ObjectType.WINDOW

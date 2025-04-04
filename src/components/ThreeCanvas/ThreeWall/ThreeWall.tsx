@@ -14,7 +14,10 @@ const ThreeWall: FC<Props> = ({ object, onClick, onContextMenu }) => {
     }
   }, [])
 
-  return <primitive object={object} onClick={onClick} onContextMenu={onContextMenu} />
+  return <primitive
+    object={object}
+    onClick={onClick}
+    onContextMenu={onContextMenu} />
 }
 
 interface Props {

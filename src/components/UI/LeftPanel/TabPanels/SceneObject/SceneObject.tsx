@@ -1,12 +1,12 @@
 import TexturePicker from '@/components/UI/TexturePicker/TexturePicker'
-import { isObjectWall, ObjectType, Wall } from '@/models/three'
-import { getModelShortName, getWallShortName, quaternionToDegree } from '@/utils/helpers/helpers'
+import { isObjectWall, isObjectWindow, ObjectType, Wall } from '@/models/three'
+import { getModelShortName, getWallShortName, getWindowShortName, quaternionToDegree } from '@/utils/helpers/helpers'
 import { loadTexture } from '@/utils/helpers/loadTexture'
 import { useStores } from '@/utils/hooks/useStores'
-import { Stack, TextField, Typography } from '@mui/material'
+import { Divider, Stack, TextField, Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { MuiColorInput } from 'mui-color-input'
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { MathUtils, RepeatWrapping, Vector3 } from 'three'
 
@@ -16,18 +16,40 @@ const SceneObject = () => {
       sceneObjects,
       setWallColor,
       wallColor,
-      setSceneObject
+      setSceneObject,
+      setSelectedObject
     }
   } = useStores()
   const params = useParams()
   const navigate = useNavigate()
-  const sceneObject = sceneObjects[params.objectId ?? '']
+  const sceneObject = useMemo(() => sceneObjects[params.objectId ?? ''], [params.objectId])
+  const [coordinates, setCoordinates] = useState<{ x: string | number, y: string | number, z: string | number }>(sceneObject?.object?.position ?? {x: 0,
+    y: 0,
+    z: 0})
 
   useEffect(() => {
     if (!sceneObject) {
       navigate('/catalogue')
+      return
     }
+
+    setSelectedObject(params.objectId)
   }, [sceneObject])
+
+  const getObjectName = (id: string) => {
+    const objectType = sceneObjects[id]?.type
+
+    switch (objectType) {
+    case ObjectType.WALL:
+      return getWallShortName(id)
+    case ObjectType.MODEL:
+      return getModelShortName(id, sceneObject.object.userData.name as string)
+    case ObjectType.WINDOW:
+      return getWindowShortName(id)
+    default:
+      return ''
+    }
+  }
 
   const changeColor = (value: string) => {
     if (isObjectWall(sceneObject.type, sceneObject.object)) {
@@ -35,9 +57,16 @@ const SceneObject = () => {
     }
   }
 
-  const changePosition = (x: number, y: number, z: number) => {
-    sceneObject.object.position.set(+x.toFixed(4), +y.toFixed(4), +z.toFixed(4))
-    setSceneObject(sceneObject.object.uuid, sceneObject.object, sceneObject.type)
+  const changePosition = (x: string | number, y: string | number, z: string | number) => {
+    setCoordinates({x,
+      y,
+      z})
+
+    if (!isNaN(+x) && x !== '' && !isNaN(+y) && y !== '' && !isNaN(+z) && z !== '') {
+      sceneObject.object.position.set(+(+x).toFixed(4), +(+y).toFixed(4), +(+z).toFixed(4))
+      setCoordinates(sceneObject.object.position)
+      setSceneObject(sceneObject.object.uuid, sceneObject.object, sceneObject.type)
+    }
   }
 
   const changeRotation = (degree: number) => {
@@ -45,12 +74,13 @@ const SceneObject = () => {
     setSceneObject(sceneObject.object.uuid, sceneObject.object, sceneObject.type)
   }
 
-  const changeTexture = async (value: string) => {
+  const changeTexture = async (src: string, repeatX = 1) => {
     if (isObjectWall(sceneObject.type, sceneObject.object)) {
-      const texture = await loadTexture(value)
+      const texture = await loadTexture(src)
       texture.wrapS = RepeatWrapping
       texture.wrapT = RepeatWrapping
-      texture.userData.src = value
+      texture.repeat.set(repeatX, 1)
+      texture.userData.src = src
       sceneObject.object.material.map = texture
       sceneObject.object.material.needsUpdate = true
 
@@ -68,9 +98,7 @@ const SceneObject = () => {
     <Typography
       variant='h6'
     >
-      {isObjectWall(sceneObject.type, sceneObject.object) ?
-        getWallShortName(sceneObject.object.uuid) :
-        getModelShortName(sceneObject.object.uuid, sceneObject.object.userData.name as string)}
+      {getObjectName(sceneObject.object.uuid)}
     </Typography>
     {isObjectWall(sceneObject.type, sceneObject.object) &&
     <>
@@ -82,40 +110,49 @@ const SceneObject = () => {
       />
       <TexturePicker
         onChange={changeTexture}
-        value={sceneObject.object.material?.map?.userData.src as string} />
+        src={sceneObject.object.material?.map?.userData.src as string}
+        repeatX={sceneObject.object.material?.map?.repeat.x}
+      />
+      <Divider />
     </>
     }
     <Stack spacing={2}>
       <TextField
         label="X"
         type="number"
-        value={sceneObject.object.position.x}
-        onChange={(e) => changePosition(+e.target.value, sceneObject.object.position.y, sceneObject.object.position.z)}
+        disabled={isObjectWindow(sceneObject.type, sceneObject.object)}
+        value={coordinates.x ? +(+coordinates.x).toFixed(4) : coordinates.x}
+        onChange={(e) => changePosition(e.target.value, coordinates.y, coordinates.z)}
+        onBlur={(e) => changePosition(+e.target.value, coordinates.y, coordinates.z)}
       />
       <TextField
         label="Y"
         type="number"
         disabled={isObjectWall(sceneObject.type, sceneObject.object)}
-        value={sceneObject.object.position.y}
-        onChange={(e) => changePosition(sceneObject.object.position.x, +e.target.value, sceneObject.object.position.z)}
+        value={coordinates.y ? +(+coordinates.y).toFixed(4) : coordinates.y}
+        onChange={(e) => changePosition(coordinates.x, e.target.value, coordinates.z)}
+        onBlur={(e) => changePosition(coordinates.x, +e.target.value, coordinates.z)}
       />
       <TextField
         label="Z"
         type="number"
-        value={sceneObject.object.position.z}
-        onChange={(e) => changePosition(sceneObject.object.position.x, sceneObject.object.position.y, +e.target.value)}
+        value={coordinates.z ? +(+coordinates.z).toFixed(4) : coordinates.z}
+        onChange={(e) => changePosition(coordinates.x, coordinates.y, e.target.value)}
+        onBlur={(e) => changePosition(coordinates.x, coordinates.y, +e.target.value)}
       />
-      <TextField
-        label="Угол поворота"
-        type="number"
-        value={quaternionToDegree(sceneObject.object.quaternion).y}
-        onChange={(e) => changeRotation(+e.target.value)}
-        slotProps={{
-          htmlInput: {
-            step: 10
-          }
-        }}
-      />
+      {
+        !isObjectWindow(sceneObject.type, sceneObject.object) && <TextField
+          label="Угол поворота"
+          type="number"
+          value={quaternionToDegree(sceneObject.object.quaternion).y}
+          onChange={(e) => changeRotation(+e.target.value)}
+          slotProps={{
+            htmlInput: {
+              step: 10
+            }
+          }}
+        />
+      }
     </Stack>
   </Stack>
 }

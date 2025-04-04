@@ -32,6 +32,8 @@ const ContextMenuTooltip: FC<ContextMenuTooltipProps> = ({ objectId }) => {
     const windowMaterial = new MeshBasicMaterial({ color: 0x3f7b9d })
     const window = new Mesh(windowGeometry, windowMaterial)
 
+    window.userData.wallId = objectId
+
     sceneObject.object.add(window)
 
     setSceneObject(window.uuid, window, ObjectType.WINDOW)

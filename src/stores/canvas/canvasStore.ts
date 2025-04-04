@@ -1,5 +1,5 @@
 import { CanvasEditMode } from '@/models/canvas'
-import { ObjectType, Wall} from '@/models/three'
+import { ObjectType, Wall, Window} from '@/models/three'
 import { Tooltip, TooltipData, TooltipType } from '@/models/tooltip'
 import { RootStore } from '@/stores/rootStore'
 import { makeAutoObservable, reaction } from 'mobx'
@@ -64,6 +64,12 @@ export class CanvasStore {
 
   get windows() {
     return this.sceneObjectsByType[ObjectType.WINDOW]
+  }
+
+  get windowsByWallId() {
+    return (id: string) => {
+      return Object.values(this.windows).filter((window) => window.userData.wallId === id)
+    }
   }
 
   setSceneObject(id: string, object: Object3D, type: ObjectType) {
@@ -147,6 +153,10 @@ export class CanvasStore {
       (current) => {
         if (![CanvasEditMode.Rotate, CanvasEditMode.Translate].includes(current)) {
           this.setSelectedObject()
+        }
+
+        if (this.tooltip?.type === TooltipType.CONTEXT_MENU) {
+          this.setTooltip(null)
         }
       })
   }

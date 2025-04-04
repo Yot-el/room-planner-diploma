@@ -17,4 +17,6 @@ export const quaternionToDegree = (quaternion: Quaternion) => {
 
 export const getWallShortName = (uuid: string) => `Стена ${uuid.toString().slice(0, 5)}`
 
+export const getWindowShortName = (uuid: string) => `Окно ${uuid.toString().slice(0, 5)}`
+
 export const getModelShortName = (uuid: string, name: string) => `${name} ${uuid.toString().slice(0, 5)}`
