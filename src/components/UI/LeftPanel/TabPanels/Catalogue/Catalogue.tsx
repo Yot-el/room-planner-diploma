@@ -33,12 +33,7 @@ const Catalogue: FC = () => {
     }
   }, [])
 
-  return  <Stack
-    spacing={1}
-    height="100%"
-    padding={1}
-    alignItems="center"
-  >
+  return  <Stack spacing={1} height='100%' padding={1} alignItems="center">
     <ImageList
       cols={1}
       rowHeight="auto"
@@ -48,9 +43,11 @@ const Catalogue: FC = () => {
           <ImageListItem
             key={item.id}
             onClick={() => { loadObjectToScene(ModelType.GLTF, item.src, item.properties.name) }}
-            sx={{ cursor: 'pointer' }}>
+            sx={{ cursor: 'pointer',
+              width: '100px'
+            }}>
             <img
-              src={''}
+              src={item.imageSrc}
               alt={item.properties.name}
               width="200"
               height="20"

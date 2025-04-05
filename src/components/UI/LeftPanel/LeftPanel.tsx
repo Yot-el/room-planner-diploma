@@ -33,12 +33,13 @@ const LeftPanel: FC = () => {
       position: 'absolute',
       left: '0',
       top: '0',
-      height: '100vh',
+      height: '100%',
       width: '20vw',
       minWidth: '300px',
       padding: '8px',
       bgcolor: 'background.paper',
       boxShadow: '10px 10px 30px -24px rgba(0,0,0,0.75);'
+      // visibility: 'hidden'
     }}
     spacing={1} >
     {
