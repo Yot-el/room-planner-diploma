@@ -17,6 +17,7 @@
     "@mui/x-tree-view": "^7.26.0",
     "@react-three/drei": "^9.120.8",
     "@react-three/fiber": "^8.17.12",
+    "axios": "^1.8.4",
     "mobx": "^6.13.5",
     "mobx-react-lite": "^4.1.0",
     "mui-color-input": "^6.0.0",

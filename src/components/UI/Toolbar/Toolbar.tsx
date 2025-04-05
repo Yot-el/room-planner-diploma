@@ -5,6 +5,7 @@ import { Box, IconButton, Stack, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { FC } from 'react'
 import { SwipeVertical, ControlCamera, Rotate90DegreesCcw } from '@mui/icons-material'
+import { red } from '@mui/material/colors'
 
 const CanvasModes = {
   [CanvasEditMode.Camera]: {
@@ -32,7 +33,7 @@ const Toolbar: FC = () => {
     sx={{
       position: 'absolute',
       left: '50%',
-      top: '0',
+      top: '1%',
       transform: 'translateX(-50%)'
     }}
     direction="row"
