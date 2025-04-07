@@ -3,7 +3,6 @@ export type CatalogueItem = {
   id: string
   type: string
   src: string
-  srcImage: string
   properties: {
     category: string
     name: string

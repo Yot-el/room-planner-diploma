@@ -89,6 +89,11 @@ export class CanvasStore {
       this.setSelectedObject()
     }
 
+    // Убираем three элемент вручную, если это окно
+    if (objectToDelete.type === ObjectType.WINDOW) {
+      objectToDelete.object.removeFromParent()
+    }
+
     // Удаляем окна у удаляемой стены
     if (objectToDelete.type === ObjectType.WALL) {
       objectToDelete.object.children.forEach((child) => {

@@ -1,9 +1,11 @@
+import { WALL_WIDTH } from '@/components/ThreeCanvas/SceneGround/SceneGround'
 import TexturePicker from '@/components/UI/TexturePicker/TexturePicker'
-import { isObjectWall, isObjectWindow, ObjectType, Wall } from '@/models/three'
+import { isObjectWall, isObjectWindow, ModelType, ObjectType, Wall } from '@/models/three'
 import { getModelShortName, getWallShortName, getWindowShortName, quaternionToDegree } from '@/utils/helpers/helpers'
 import { loadTexture } from '@/utils/helpers/loadTexture'
+import { clampWallChildPosition, getBufferGeometrySize } from '@/utils/helpers/three'
 import { useStores } from '@/utils/hooks/useStores'
-import { Divider, Stack, TextField, Typography } from '@mui/material'
+import { Button, Divider, Stack, TextField, Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { MuiColorInput } from 'mui-color-input'
 import { useEffect, useMemo, useState } from 'react'
@@ -62,10 +64,18 @@ const SceneObject = () => {
       y,
       z})
 
+    // Если координаты валидны (в полях числовые значения, а не пустые строки и '-', '+' и т.д.),
+    // то состояние объекта обновляется и начинает снова отслеживаться (передаваться в инпуты)
     if (!isNaN(+x) && x !== '' && !isNaN(+y) && y !== '' && !isNaN(+z) && z !== '') {
       sceneObject.object.position.set(+(+x).toFixed(4), +(+y).toFixed(4), +(+z).toFixed(4))
       setCoordinates(sceneObject.object.position)
       setSceneObject(sceneObject.object.uuid, sceneObject.object, sceneObject.type)
+
+      if (isObjectWindow(sceneObject.type, sceneObject.object)) {
+        const wall = sceneObject.object.parent as Wall
+
+        clampWallChildPosition(wall, sceneObject.object)
+      }
     }
   }
 

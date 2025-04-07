@@ -1,18 +1,19 @@
 import SceneGround from '@/components/ThreeCanvas/SceneGround/SceneGround'
 import ThreeTooltip from '@/components/ThreeCanvas/ThreeTooltip/ThreeTooltip'
-import { WINDOW_HEIGHT, WINDOW_LENGTH } from '@/components/ThreeCanvas/ThreeTooltip/tooltips/ContextMenuTooltip'
 import ThreeWall from '@/components/ThreeCanvas/ThreeWall/ThreeWall'
 import { CanvasEditMode } from '@/models/canvas'
-import { ObjectType, Wall } from '@/models/three'
+import { isObjectWindow, ObjectType, Wall, Window } from '@/models/three'
 import { TooltipType } from '@/models/tooltip'
 import { DEFAULT_COLOR } from '@/stores/canvas/canvasStore'
 import { quaternionToDegree } from '@/utils/helpers/helpers'
+import { clampWallChildPosition } from '@/utils/helpers/three'
 import { useStores } from '@/utils/hooks/useStores'
 import { OrbitControls, TransformControls } from '@react-three/drei'
 import { ThreeEvent, useThree } from '@react-three/fiber'
 import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useRef } from 'react'
-import { Color, DirectionalLight, Vector3 } from 'three'
+import { Color, DirectionalLight } from 'three'
+import { useTheme } from '@mui/material'
 
 const getTransformControlsMode = (mode: CanvasEditMode) => {
   if (mode === CanvasEditMode.Translate) return 'translate'
@@ -28,6 +29,7 @@ const Scene: FC = () => {
     }
   } = useStores()
 
+  const theme = useTheme()
   const { scene } = useThree()
   const lightRef = useRef<DirectionalLight | null>(null)
 
@@ -38,7 +40,9 @@ const Scene: FC = () => {
   const onObjectClick = (event: ThreeEvent<MouseEvent>) => {
     if (isTransformControlsEnabled) {
       const objectId = event.eventObject.uuid
-      const nearestObjectClicked = event.intersections[0].object
+      const nearestObjectClicked = event.intersections[0].object.userData.wallChildClone ?
+        sceneObjects[(event.intersections[0].object.parent as Window).uuid].object
+        :  event.intersections[0].object
 
       // Выбираем ближайший объект, если он есть в списке всех модифицируемых объектов
       // Иначе выбираем тот объект, на который повешен обработчик (либо модель, либо стена)
@@ -53,7 +57,9 @@ const Scene: FC = () => {
 
   const onRightButtonClick = (event: ThreeEvent<MouseEvent>) => {
     if (currentMode !== CanvasEditMode.Camera) return
-    const nearestObjectClicked = event.intersections[0].object
+    const nearestObjectClicked = event.intersections[0].object.userData.wallChildClone ?
+      sceneObjects[(event.intersections[0].object.parent as Window).uuid].object
+      :  event.intersections[0].object
 
     const objectForContextMenu = sceneObjects[nearestObjectClicked.uuid] ? nearestObjectClicked : event.eventObject
 
@@ -70,11 +76,9 @@ const Scene: FC = () => {
     if (!selectedObject) return
 
     if (currentMode === CanvasEditMode.Translate) {
-      if (selectedObject.type === ObjectType.WINDOW) {
+      if (isObjectWindow(selectedObject.type, selectedObject.object)) {
         const wall = selectedObject.object.parent as Wall
-        const maxPosition = new Vector3(0, wall.geometry.parameters.height / 2 - WINDOW_HEIGHT / 2, wall.geometry.parameters.depth - WINDOW_LENGTH)
-
-        selectedObject.object.position.clamp(new Vector3(0, -WINDOW_HEIGHT / 2, 0), maxPosition)
+        clampWallChildPosition(wall, selectedObject.object)
       }
 
       const { x, y, z } = selectedObject.object.position
@@ -141,11 +145,11 @@ const Scene: FC = () => {
     <TransformControls
       object={selectedObject?.object}
       enabled={isTransformControlsEnabled}
-      showX={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate && selectedObject.type !== ObjectType.WINDOW}
+      showX={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate}
       showY={isTransformControlsAxisEnabled &&
         ((currentMode === CanvasEditMode.Rotate && selectedObject.type !== ObjectType.WINDOW) ||
         (currentMode === CanvasEditMode.Translate && selectedObject.type !== ObjectType.WALL))}
-      showZ={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate}
+      showZ={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate && selectedObject.type !== ObjectType.WINDOW}
       mode={getTransformControlsMode(currentMode)}
       onObjectChange={onSelectedObjectChange}
       onMouseUp={() => setTooltip(null)}

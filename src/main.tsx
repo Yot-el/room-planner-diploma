@@ -4,7 +4,7 @@ import '@/assets/styles/main.css'
 import Box from '@mui/material/Box'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import App from './App.tsx'
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router'
+import { BrowserRouter, createBrowserRouter, Navigate, Outlet, Route, RouterProvider, Routes } from 'react-router'
 import Catalogue from '@/components/UI/LeftPanel/TabPanels/Catalogue/Catalogue.tsx'
 import SceneTree from '@/components/UI/LeftPanel/TabPanels/SceneTree/SceneTree.tsx'
 import Tools from '@/components/UI/LeftPanel/TabPanels/Tools/Tools.tsx'
@@ -16,7 +16,6 @@ import SignupForm from './components/UI/Auth/SignupForm.tsx'
 import Login from './components/UI/Auth/Login.tsx'
 import Account from './components/UI/Auth/Account.tsx'
 import ForgotPassword from './components/UI/Auth/ForgotPassword.tsx'
-import { element } from 'three/src/nodes/TSL.js'
 import ProtectedRoute from './components/UI/Auth/ProtectedRoute.tsx'
 import ResetPassword from './components/UI/Auth/ResetPassword.tsx'
 import UpdatePassword from './components/UI/Auth/UpdatePassword.tsx'
@@ -29,66 +28,88 @@ const theme = createTheme({
   }
 })
 
+const Layout = () => {
+  return <AuthProvider>
+    <Box
+      sx={{ display: 'flex',
+        flexDirection: 'column',
+        height: '100vh' }}>
+      <Navbar />
+      <Outlet />
+    </Box>
+  </AuthProvider>
+}
+
+export const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      {
+        path: '/signup',
+        element: <SignupForm />
+      },
+      {
+        path: '/login',
+        element: <Login />
+      },
+      {
+        path: '/forgot-password',
+        element: <ForgotPassword />
+      },
+      {
+        path: '/reset-password/:token',
+        element: <ResetPassword />
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: '/account',
+            element: <Account />
+          },
+          {
+            path: '/update-password',
+            element: <UpdatePassword />
+          }
+        ]
+      },
+      {
+        element: <App />,
+        path: '/',
+        children: [
+          {
+            path: 'catalogue',
+            element: <Catalogue />
+          },
+          {
+            path: 'scene-graph',
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: <SceneTree />
+              },
+              {
+                path: ':objectId',
+                element: <SceneObject />
+              }
+            ]
+          },
+          {
+            path: 'tools',
+            element: <Tools />
+          }
+        ]
+      }
+    ]
+  }
+])
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        <AuthProvider>
-          <Box
-            sx={{ display: 'flex',
-              flexDirection: 'column',
-              // background: 'orangered',
-              height: '100vh' }}>
-            <Navbar />
-            <Routes>
-              <Route
-                path='/signup'
-                element={<SignupForm />} />
-              <Route
-                path='/login'
-                element={<Login />} />
-              <Route
-                path='/forgot-password'
-                element={<ForgotPassword />} />
-              <Route
-                path='/reset-password/:token'
-                element={<ResetPassword />}>
-              </Route>
-              <Route element={<ProtectedRoute />}>
-                <Route
-                  path='/account'
-                  element={<Account />}>
-                </Route>
-                <Route
-                  path='/update-password'
-                  element={<UpdatePassword />}>
-                </Route>
-              </Route>
-              <Route
-                path="/"
-                element={<App />} >
-                <Route
-                  path="catalogue"
-                  element={<Catalogue />} />
-                <Route
-                  path="scene-graph"
-                  element={<Outlet />}>
-                  <Route
-                    index
-                    element={<SceneTree />} />
-                  <Route
-                    path=":objectId"
-                    element={<SceneObject />} />
-                </Route>
-                <Route
-                  path="tools"
-                  element={<Tools />} />
-              </Route>
-            </Routes>
-          </Box>
-        </AuthProvider>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </ThemeProvider>
   </StrictMode>
 )
