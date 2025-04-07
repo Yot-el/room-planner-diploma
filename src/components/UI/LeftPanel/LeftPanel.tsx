@@ -62,7 +62,10 @@ const LeftPanel: FC = () => {
                 />))
             }
           </Tabs>
-          <Box flexGrow={1}>
+          <Box
+            flexGrow={1}
+            height="100%"
+          >
             <Outlet />
           </Box>
         </>

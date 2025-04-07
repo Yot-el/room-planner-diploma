@@ -24,7 +24,7 @@ const SceneObject = () => {
   } = useStores()
   const params = useParams()
   const navigate = useNavigate()
-  const sceneObject = useMemo(() => sceneObjects[params.objectId ?? ''], [params.objectId])
+  const sceneObject = sceneObjects[params.objectId ?? '']
   const [coordinates, setCoordinates] = useState<{ x: string | number, y: string | number, z: string | number }>(sceneObject?.object?.position ?? {x: 0,
     y: 0,
     z: 0})

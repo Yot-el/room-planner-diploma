@@ -1,11 +1,15 @@
+import CatalogueItem from '@/components/UI/LeftPanel/TabPanels/Catalogue/CatalogueItem'
 import { WALL_WIDTH } from '@/components/ThreeCanvas/SceneGround/SceneGround'
 import { ModelType, ObjectType } from '@/models/three'
 import { loadModel } from '@/utils/helpers/loadModel'
 import { clampWallChildPosition, createWindow, getBufferGeometrySize } from '@/utils/helpers/three'
 import { useStores } from '@/utils/hooks/useStores'
-import { ImageList, ImageListItem, Pagination, Stack } from '@mui/material'
+import { Box, IconButton, ImageList, ImageListItem, Pagination, Stack } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { FC, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router'
+import { CategoryItem, FurnitureItem } from '@/models/catalogue'
+import { ArrowBack, CategoryOutlined } from '@mui/icons-material'
 
 const Catalogue: FC = () => {
   const {
@@ -23,6 +27,10 @@ const Catalogue: FC = () => {
       page
     }
   } = useStores()
+
+  const params = useParams()
+  const navigate = useNavigate()
+  const categoryId = params.categoryId
 
   const loadObjectToScene = async (type: ModelType, url: string, name: string, category: string) => {
     const object = await loadModel(type, url)
@@ -53,47 +61,63 @@ const Catalogue: FC = () => {
     }
   }
 
+  const goToCategory = (id: string) => {
+    navigate(`/catalogue/${id}`)
+  }
+
   useEffect(() => {
-    if (!items.length) {
-      changePage(1)
-    }
-  }, [])
+    changePage(1, categoryId)
+  }, [categoryId])
 
   return  <Stack
     spacing={1}
-    height='100%'
     padding={1}
-    alignItems="center">
+    alignItems="center"
+    sx={{
+      height: '1px',
+      minHeight: '100%'
+    }}
+  >
+    {
+      categoryId && <Box width="100%">
+        <IconButton
+          onClick={() => navigate(-1)}
+          size="small">
+          <ArrowBack />
+        </IconButton>
+      </Box>
+    }
     <ImageList
       cols={1}
-      rowHeight="auto"
-      sx={{ flexGrow: 1 }}>
+      rowHeight={150}
+      sx={{ flexGrow: 1,
+        width: '100%',
+        overflowY: 'scroll'
+      }}>
       {
         items.map((item) => (
-          <ImageListItem
+          <CatalogueItem
             key={item.id}
-            onClick={() => { loadObjectToScene(ModelType.GLTF, item.src, item.properties.name, item.properties.category) }}
-            sx={{ cursor: 'pointer',
-              width: '100px'
-            }}>
-            <img
-              src={item.imageSrc}
-              alt={item.properties.name}
-              width="200"
-              height="20"
-              loading="lazy"
-            />
-          </ImageListItem>
+            onClick={!categoryId ?
+              () => { goToCategory(item.id) } :
+              () => {
+                const furniture = item as FurnitureItem
+                loadObjectToScene(furniture.type as ModelType, furniture.src, furniture.properties.name, furniture.properties.category)
+              } }
+            imageSrc={item.imageSrc ?? ''}
+            name={(item as CategoryItem).category ?? ''} />
         ))
       }
     </ImageList>
-    <Pagination
-      count={pageCount}
-      page={page}
-      color="primary"
-      size="small"
-      onChange={(_, page) => changePage(page)}
-    />
+    {
+      !categoryId && <Pagination
+        count={pageCount}
+        page={page}
+        color="primary"
+        size="small"
+        onChange={(_, page) => changePage(page)}
+      />
+    }
   </Stack>
 }
 

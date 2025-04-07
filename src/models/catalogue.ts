@@ -1,5 +1,5 @@
-export type CatalogueItem = {
-  imageSrc: string | undefined
+export type FurnitureItem = {
+  imageSrc?: string
   id: string
   type: string
   src: string
@@ -10,10 +10,18 @@ export type CatalogueItem = {
   }
 }
 
-export type CatalogueResponse = {
+export type CategoryItem = {
+  id: string
+  category: string
+  imageSrc: string
+}
+
+export type CatalogueResponse<T> = {
   result: {
     page: number
     pageSize: number
-    items: CatalogueItem[]
+    items: T[]
   }
 }
+
+export type CatalogueItem = CategoryItem | FurnitureItem

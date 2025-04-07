@@ -1,6 +1,6 @@
-import { CatalogueItem } from '@/models/catalogue'
+import { CatalogueItem, CategoryItem } from '@/models/catalogue'
 import { RootStore } from '@/stores/rootStore'
-import { getPageItems } from '@/utils/helpers/api'
+import { getCategoriesUrl, getCategoryItemsUrl, getPageItems } from '@/utils/helpers/api'
 import { makeAutoObservable } from 'mobx'
 
 export class CatalogueStore {
@@ -22,11 +22,13 @@ export class CatalogueStore {
     this.items = value
   }
 
-  async changePage(nextPage: number) {
-    const items = await getPageItems(nextPage)
+  async changePage(nextPage: number, categoryId?: string) {
+    const items = await getPageItems<CatalogueItem>(!categoryId ? getCategoriesUrl(nextPage) : getCategoryItemsUrl(categoryId, nextPage))
 
-    if (items?.result) {
-      this.setItems(items.result.items)
+    // TODO: Переделать при добавлении пагинации для отдельных категорий
+    if (items && (items.result || categoryId)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.setItems(!categoryId ? items.result.items : (items as any).items)
       this.setPage(nextPage)
     }
   }
