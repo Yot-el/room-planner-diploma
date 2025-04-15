@@ -4,6 +4,8 @@ export const getBaseUrl = () => import.meta.env.APP_BASE_URL ? `http://${import.
 
 export const getDefaultWindowUrl = () => `${window.location.origin}/models/windows/window021.glb`
 
+export const getDefaultDoorUrl = () => `${window.location.origin}/models/doors/door006.glb`
+
 const PAGE_SIZE = 5
 export const getPageItems = async <T,>(url: string): Promise<CatalogueResponse<T> | null> => {
   // const url = `/furniture?page=${page}&pageSize=${PAGE_SIZE}`

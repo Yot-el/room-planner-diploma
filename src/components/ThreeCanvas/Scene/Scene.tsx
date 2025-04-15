@@ -2,7 +2,7 @@ import SceneGround from '@/components/ThreeCanvas/SceneGround/SceneGround'
 import ThreeTooltip from '@/components/ThreeCanvas/ThreeTooltip/ThreeTooltip'
 import ThreeWall from '@/components/ThreeCanvas/ThreeWall/ThreeWall'
 import { CanvasEditMode } from '@/models/canvas'
-import { isObjectWindow, ObjectType, Wall, Window } from '@/models/three'
+import { isObjectDoor, isObjectWindow, ObjectType, Wall, Window } from '@/models/three'
 import { TooltipType } from '@/models/tooltip'
 import { DEFAULT_COLOR } from '@/stores/canvas/canvasStore'
 import { quaternionToDegree } from '@/utils/helpers/helpers'
@@ -76,7 +76,7 @@ const Scene: FC = () => {
     if (!selectedObject) return
 
     if (currentMode === CanvasEditMode.Translate) {
-      if (isObjectWindow(selectedObject.type, selectedObject.object)) {
+      if (isObjectWindow(selectedObject.type, selectedObject.object) || isObjectDoor(selectedObject.type, selectedObject.object)) {
         const wall = selectedObject.object.parent as Wall
         clampWallChildPosition(wall, selectedObject.object)
       }
@@ -147,13 +147,13 @@ const Scene: FC = () => {
       enabled={isTransformControlsEnabled}
       showX={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate}
       showY={isTransformControlsAxisEnabled &&
-        ((currentMode === CanvasEditMode.Rotate && selectedObject.type !== ObjectType.WINDOW) ||
+        ((currentMode === CanvasEditMode.Rotate && ![ObjectType.WINDOW, ObjectType.DOOR].includes(selectedObject.type)) ||
         (currentMode === CanvasEditMode.Translate && selectedObject.type !== ObjectType.WALL))}
-      showZ={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate && selectedObject.type !== ObjectType.WINDOW}
+      showZ={isTransformControlsAxisEnabled && currentMode === CanvasEditMode.Translate && ![ObjectType.WINDOW, ObjectType.DOOR].includes(selectedObject.type)}
       mode={getTransformControlsMode(currentMode)}
       onObjectChange={onSelectedObjectChange}
       onMouseUp={() => setTooltip(null)}
-      space={selectedObject?.type === ObjectType.WINDOW ? 'local' : 'world'}
+      space={selectedObject && [ObjectType.WINDOW, ObjectType.DOOR].includes(selectedObject.type) ? 'local' : 'world'}
     />
     <ThreeTooltip />
     <fog

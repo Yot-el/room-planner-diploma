@@ -1,8 +1,7 @@
 import {  BufferGeometry, MathUtils, Vector3 } from 'three'
-import { ModelType, Wall, Window } from '@/models/three'
+import { Door, ModelType, ObjectType, Wall, Window } from '@/models/three'
 import { loadModel } from '@/utils/helpers/loadModel'
 import { WALL_WIDTH } from '@/components/ThreeCanvas/SceneGround/SceneGround'
-import { getDefaultWindowUrl } from '@/utils/helpers/api'
 
 export const getBufferGeometrySize = (geometry: BufferGeometry) => {
   const size = new Vector3()
@@ -17,26 +16,26 @@ export const clampWallChildPosition = (wall: Wall, child: Window) => {
   child.position.clamp(new Vector3(0, childSize.y / 2, childSize.x / 2 + 0.1), maxPosition)
 }
 
-export const createWindow = async (wall: Wall, modelSrc?: string) => {
-  const windowModel = await loadModel(ModelType.GLTF, modelSrc ?? getDefaultWindowUrl()) as Window
+export const createWallChild = async <T extends Window | Door>(wall: Wall, modelSrc: string, type?: ObjectType.WINDOW | ObjectType.DOOR): Promise<T | undefined> => {
+  const model = await loadModel(ModelType.GLTF, modelSrc) as T
 
   // Дополнительная модель для другой стороны стены (нужна в силу особенности моделей окон и геометрии стены)
-  const windowModelClone = windowModel.clone()
-  const windowModelSize = getBufferGeometrySize(windowModel.geometry)
+  const modelClone = model.clone()
+  const modelSize = getBufferGeometrySize(model.geometry)
 
   // Невозможно построить окно, если длина стены меньше длины окна
-  if (windowModelSize.x >= wall.geometry.parameters.depth) return
+  if (modelSize.x >= wall.geometry.parameters.depth) return
 
-  wall.add(windowModel)
+  wall.add(model)
 
-  windowModel.add(windowModelClone)
-  windowModelClone.rotateY(MathUtils.degToRad(180))
-  windowModelClone.position.set(0, 0, -WALL_WIDTH - windowModelSize.z)
-  windowModelClone.userData.wallChildClone = true
+  model.add(modelClone)
+  if (type === ObjectType.WINDOW) modelClone.rotateY(MathUtils.degToRad(180))
+  modelClone.position.set(0, 0, -WALL_WIDTH - modelSize.z)
+  modelClone.userData.wallChildClone = true
 
-  windowModel.rotateY(MathUtils.degToRad(90))
+  model.rotateY(MathUtils.degToRad(90))
 
-  windowModel.userData.wallId = wall.uuid
+  model.userData.wallId = wall.uuid
 
-  return windowModel
+  return model
 }

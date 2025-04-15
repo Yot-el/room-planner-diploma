@@ -2,7 +2,7 @@ import CatalogueItem from '@/components/UI/LeftPanel/TabPanels/Catalogue/Catalog
 import { WALL_WIDTH } from '@/components/ThreeCanvas/SceneGround/SceneGround'
 import { ModelType, ObjectType } from '@/models/three'
 import { loadModel } from '@/utils/helpers/loadModel'
-import { clampWallChildPosition, createWindow, getBufferGeometrySize } from '@/utils/helpers/three'
+import { clampWallChildPosition, createWallChild, getBufferGeometrySize } from '@/utils/helpers/three'
 import { useStores } from '@/utils/hooks/useStores'
 import { Box, IconButton, ImageList, ImageListItem, Pagination, Stack } from '@mui/material'
 import { observer } from 'mobx-react-lite'
@@ -10,6 +10,7 @@ import { FC, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { CategoryItem, FurnitureItem } from '@/models/catalogue'
 import { ArrowBack, CategoryOutlined } from '@mui/icons-material'
+import { Window } from '@/models/three'
 
 const Catalogue: FC = () => {
   const {
@@ -43,12 +44,13 @@ const Catalogue: FC = () => {
       return
     }
 
+    // TODO: Переделать под двери
     // Двери и окна ставятся заместо выбранного объекта (если типы соотносятся)
     if (selectedObject && category === selectedObject?.type as string) {
       const wall = walls[selectedObject.object.userData.wallId]
       const previousWindowPosition = selectedObject.object.position
 
-      const newWindow = await createWindow(wall, url)
+      const newWindow = await createWallChild<Window>(wall, url, ObjectType.WINDOW)
 
       if (newWindow) {
         const windowModelSize = getBufferGeometrySize(newWindow.geometry)

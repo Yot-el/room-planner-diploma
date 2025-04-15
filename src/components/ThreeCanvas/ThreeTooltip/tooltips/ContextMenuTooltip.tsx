@@ -4,11 +4,12 @@ import { Stack, Box, IconButton, Button } from '@mui/material'
 import { FC } from 'react'
 import { Close } from '@mui/icons-material'
 import { CanvasEditMode } from '@/models/canvas'
-import { Window, Delete, ArrowBack } from '@mui/icons-material'
+import { Window, Delete, ArrowBack, SensorDoor } from '@mui/icons-material'
 import { ObjectType, Wall } from '@/models/three'
-import { createWindow, getBufferGeometrySize } from '@/utils/helpers/three'
+import { createWallChild, getBufferGeometrySize } from '@/utils/helpers/three'
 import { WALL_WIDTH } from '@/components/ThreeCanvas/SceneGround/SceneGround'
 import { router } from '@/main.tsx'
+import { getDefaultDoorUrl, getDefaultWindowUrl } from '@/utils/helpers/api'
 
 const ContextMenuTooltip: FC<ContextMenuTooltipProps> = ({ objectId }) => {
   const {
@@ -23,17 +24,18 @@ const ContextMenuTooltip: FC<ContextMenuTooltipProps> = ({ objectId }) => {
 
   const sceneObject = sceneObjects[objectId]
 
-  const addNewWindow = async () => {
-    const windowModel = await createWindow(sceneObject.object as Wall)
+  const addNewWallChild = async (type: ObjectType.WINDOW | ObjectType.DOOR) => {
+    const childUrl = type === ObjectType.WINDOW ? getDefaultWindowUrl() : getDefaultDoorUrl()
+    const model = await createWallChild(sceneObject.object as Wall, childUrl, type)
 
-    if (!windowModel) return
+    if (!model) return
 
-    const windowModelSize = getBufferGeometrySize(windowModel?.geometry)
-    // Так как окно теперь повернуто на 90 градусов, то позиция x устанавливается как z
-    // Окно устанавливается на краю стены (в силу особенности используемых моделей для окон и геометрии стен)
-    windowModel.position.set(WALL_WIDTH / 2 + windowModelSize.z / 2, windowModelSize.y / 2 , windowModelSize.x / 2 + 0.1)
+    const modelSize = getBufferGeometrySize(model?.geometry)
+    // Так как будущий элемент теперь повернут на 90 градусов, то позиция x устанавливается как z
+    // Двери и окна устанавливаются на краю стены (в силу особенности используемых моделей для дверей и окон, а также геометрии стен)
+    model.position.set(WALL_WIDTH / 2 + modelSize.z / 2, modelSize.y / 2 , modelSize.x / 2 + 0.1)
 
-    setSceneObject(windowModel.uuid, windowModel, ObjectType.WINDOW)
+    setSceneObject(model.uuid, model, type)
     setCurrentMode(CanvasEditMode.Camera)
     setTooltip(null)
   }
@@ -63,12 +65,20 @@ const ContextMenuTooltip: FC<ContextMenuTooltipProps> = ({ objectId }) => {
     <Stack spacing={1}>
       {
         sceneObject.type === ObjectType.WALL &&
-        <Button
-          onClick={addNewWindow}
-          variant="contained"
-          startIcon={<Window />}>
-        Построить окно
-        </Button>
+        <>
+          <Button
+            onClick={() => addNewWallChild(ObjectType.WINDOW)}
+            variant="contained"
+            startIcon={<Window />}>
+            Построить окно
+          </Button>
+          <Button
+            onClick={() => addNewWallChild(ObjectType.DOOR)}
+            variant="contained"
+            startIcon={<SensorDoor />}>
+            Построить дверь
+          </Button>
+        </>
       }
       <Button
         onClick={goToSceneObjectPage}

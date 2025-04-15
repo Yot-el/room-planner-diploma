@@ -1,5 +1,5 @@
 import { CanvasEditMode } from '@/models/canvas'
-import { ObjectType, Wall, Window} from '@/models/three'
+import { Door, isObjectDoor, isObjectWindow, ObjectType, Wall, Window} from '@/models/three'
 import { Tooltip, TooltipData, TooltipType } from '@/models/tooltip'
 import { RootStore } from '@/stores/rootStore'
 import { makeAutoObservable, reaction } from 'mobx'
@@ -25,7 +25,8 @@ export class CanvasStore {
     const types = {
       [ObjectType.MODEL]: {} as Record<string, Object3D>,
       [ObjectType.WALL]: {} as Record<string, Wall>,
-      [ObjectType.WINDOW]: {} as Record<string, Window>
+      [ObjectType.WINDOW]: {} as Record<string, Window>,
+      [ObjectType.DOOR]: {} as Record<string, Door>
     }
 
     Object.entries(this.sceneObjects).forEach(([id, sceneObject]) => {
@@ -66,9 +67,19 @@ export class CanvasStore {
     return this.sceneObjectsByType[ObjectType.WINDOW]
   }
 
+  get doors() {
+    return this.sceneObjectsByType[ObjectType.DOOR]
+  }
+
   get windowsByWallId() {
     return (id: string) => {
       return Object.values(this.windows).filter((window) => window.userData.wallId === id)
+    }
+  }
+
+  get doorsByWallId() {
+    return (id: string) => {
+      return Object.values(this.doors).filter((door) => door.userData.wallId === id)
     }
   }
 
@@ -90,7 +101,7 @@ export class CanvasStore {
     }
 
     // Убираем three элемент вручную, если это окно
-    if (objectToDelete.type === ObjectType.WINDOW) {
+    if (isObjectWindow(objectToDelete.type, objectToDelete.object) || isObjectDoor(objectToDelete.type, objectToDelete.object)) {
       objectToDelete.object.removeFromParent()
     }
 

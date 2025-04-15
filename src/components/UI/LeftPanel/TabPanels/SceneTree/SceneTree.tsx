@@ -1,4 +1,4 @@
-import { getModelShortName, getWallShortName, getWindowShortName } from '@/utils/helpers/helpers'
+import { getDoorShortName, getModelShortName, getWallShortName, getWindowShortName } from '@/utils/helpers/helpers'
 import { useStores } from '@/utils/hooks/useStores'
 import { Button, Stack, useTheme } from '@mui/material'
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view'
@@ -14,7 +14,8 @@ const SceneTree: FC = () => {
       models,
       walls,
       selectedObject,
-      windowsByWallId
+      windowsByWallId,
+      doorsByWallId
     }
   } = useStores()
   const navigate = useNavigate()
@@ -73,6 +74,21 @@ const SceneTree: FC = () => {
                       navigate(`${window.uuid}`)
                     }}
                     sx={selectedObject?.object.uuid === window.uuid ? {
+                      color: 'warning.main'
+                    } : {}}
+                  />
+                  ))
+                }
+                {
+                  doorsByWallId(wall.uuid).map((door) => (<TreeItem
+                    key={door.uuid}
+                    itemId={door.uuid}
+                    label={getDoorShortName(door.uuid)}
+                    onDoubleClick={(e) => {
+                      e.stopPropagation()
+                      navigate(`${door.uuid}`)
+                    }}
+                    sx={selectedObject?.object.uuid === door.uuid ? {
                       color: 'warning.main'
                     } : {}}
                   />

@@ -19,4 +19,6 @@ export const getWallShortName = (uuid: string) => `Стена ${uuid.toString().
 
 export const getWindowShortName = (uuid: string) => `Окно ${uuid.toString().slice(0, 5)}`
 
+export const getDoorShortName = (uuid: string) => `Дверь ${uuid.toString().slice(0, 5)}`
+
 export const getModelShortName = (uuid: string, name: string) => `${name} ${uuid.toString().slice(0, 5)}`

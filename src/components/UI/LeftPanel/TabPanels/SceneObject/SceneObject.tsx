@@ -1,7 +1,7 @@
 import { WALL_WIDTH } from '@/components/ThreeCanvas/SceneGround/SceneGround'
 import TexturePicker from '@/components/UI/TexturePicker/TexturePicker'
-import { isObjectWall, isObjectWindow, ModelType, ObjectType, Wall } from '@/models/three'
-import { getModelShortName, getWallShortName, getWindowShortName, quaternionToDegree } from '@/utils/helpers/helpers'
+import { isObjectDoor, isObjectWall, isObjectWindow, ModelType, ObjectType, Wall } from '@/models/three'
+import { getDoorShortName, getModelShortName, getWallShortName, getWindowShortName, quaternionToDegree } from '@/utils/helpers/helpers'
 import { loadTexture } from '@/utils/helpers/loadTexture'
 import { clampWallChildPosition, getBufferGeometrySize } from '@/utils/helpers/three'
 import { useStores } from '@/utils/hooks/useStores'
@@ -48,6 +48,8 @@ const SceneObject = () => {
       return getModelShortName(id, sceneObject.object.userData.name as string)
     case ObjectType.WINDOW:
       return getWindowShortName(id)
+    case ObjectType.DOOR:
+      return getDoorShortName(id)
     default:
       return ''
     }
@@ -71,7 +73,7 @@ const SceneObject = () => {
       setCoordinates(sceneObject.object.position)
       setSceneObject(sceneObject.object.uuid, sceneObject.object, sceneObject.type)
 
-      if (isObjectWindow(sceneObject.type, sceneObject.object)) {
+      if (isObjectWindow(sceneObject.type, sceneObject.object) || isObjectDoor(sceneObject.type, sceneObject.object)) {
         const wall = sceneObject.object.parent as Wall
 
         clampWallChildPosition(wall, sceneObject.object)
@@ -130,7 +132,7 @@ const SceneObject = () => {
       <TextField
         label="X"
         type="number"
-        disabled={isObjectWindow(sceneObject.type, sceneObject.object)}
+        disabled={isObjectWindow(sceneObject.type, sceneObject.object) || isObjectDoor(sceneObject.type, sceneObject.object)}
         value={coordinates.x ? +(+coordinates.x).toFixed(4) : coordinates.x}
         onChange={(e) => changePosition(e.target.value, coordinates.y, coordinates.z)}
         onBlur={(e) => changePosition(+e.target.value, coordinates.y, coordinates.z)}
@@ -151,7 +153,7 @@ const SceneObject = () => {
         onBlur={(e) => changePosition(coordinates.x, coordinates.y, +e.target.value)}
       />
       {
-        !isObjectWindow(sceneObject.type, sceneObject.object) && <TextField
+        !isObjectWindow(sceneObject.type, sceneObject.object) && !isObjectDoor(sceneObject.type, sceneObject.object) && <TextField
           label="Угол поворота"
           type="number"
           value={quaternionToDegree(sceneObject.object.quaternion).y}
