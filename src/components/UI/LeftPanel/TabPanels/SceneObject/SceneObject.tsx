@@ -89,11 +89,14 @@ const SceneObject = () => {
   const changeTexture = async (src: string, repeatX = 1) => {
     if (isObjectWall(sceneObject.type, sceneObject.object)) {
       const texture = await loadTexture(src)
+      // Дополнительные флаги для указания, что текстура должна повторяться
       texture.wrapS = RepeatWrapping
       texture.wrapT = RepeatWrapping
+      // Установка выбранного повтора по X
       texture.repeat.set(repeatX, 1)
       texture.userData.src = src
       sceneObject.object.material.map = texture
+      // Флаг для того, чтобы отображение объекта обновилось
       sceneObject.object.material.needsUpdate = true
 
       setSceneObject(sceneObject.object.uuid, sceneObject.object, ObjectType.WALL)

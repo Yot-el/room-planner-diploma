@@ -36,7 +36,7 @@ const Catalogue: FC = () => {
   const loadObjectToScene = async (type: ModelType, url: string, name: string, category: string) => {
     const object = await loadModel(type, url)
 
-    if (!['door', 'window'].includes(category)) {
+    if (!['doors', 'windows'].includes(category)) {
       const { x, y, z } = object.position
       object.position.set(+x.toFixed(4), +y.toFixed(4), +z.toFixed(4))
       object.userData.name = name
@@ -44,20 +44,22 @@ const Catalogue: FC = () => {
       return
     }
 
-    // TODO: Переделать под двери
     // Двери и окна ставятся заместо выбранного объекта (если типы соотносятся)
-    if (selectedObject && category === selectedObject?.type as string) {
+    if (selectedObject &&
+      (category === 'windows' && selectedObject.type === ObjectType.WINDOW ||
+        category === 'doors' && selectedObject.type === ObjectType.DOOR)) {
       const wall = walls[selectedObject.object.userData.wallId]
-      const previousWindowPosition = selectedObject.object.position
+      const previousChildPosition = selectedObject.object.position
 
-      const newWindow = await createWallChild<Window>(wall, url, ObjectType.WINDOW)
+      const type = category === 'windows' ? ObjectType.WINDOW : ObjectType.DOOR
+      const newChild = await createWallChild(wall, url, type)
 
-      if (newWindow) {
-        const windowModelSize = getBufferGeometrySize(newWindow.geometry)
-        newWindow.position.set(WALL_WIDTH / 2 + windowModelSize.z / 2, previousWindowPosition.y, previousWindowPosition.z)
-        clampWallChildPosition(wall, newWindow)
-        setSceneObject(newWindow.uuid, newWindow, ObjectType.WINDOW)
-        setSelectedObject(newWindow.uuid)
+      if (newChild) {
+        const windowModelSize = getBufferGeometrySize(newChild.geometry)
+        newChild.position.set(WALL_WIDTH / 2 + windowModelSize.z / 2, previousChildPosition.y, previousChildPosition.z)
+        clampWallChildPosition(wall, newChild)
+        setSceneObject(newChild.uuid, newChild, type)
+        setSelectedObject(newChild.uuid)
         deleteSceneObject(selectedObject.object.uuid)
       }
     }
