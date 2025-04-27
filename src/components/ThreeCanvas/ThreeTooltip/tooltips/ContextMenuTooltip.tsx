@@ -9,7 +9,7 @@ import { ObjectType, Wall } from '@/models/three'
 import { createWallChild, getBufferGeometrySize } from '@/utils/helpers/three'
 import { WALL_WIDTH } from '@/components/ThreeCanvas/SceneGround/SceneGround'
 import { router } from '@/main.tsx'
-import { getDefaultDoorUrl, getDefaultWindowUrl } from '@/utils/helpers/api'
+import { getDefaultDoor, getDefaultWindow } from '@/utils/helpers/api'
 
 const ContextMenuTooltip: FC<ContextMenuTooltipProps> = ({ objectId }) => {
   const {
@@ -25,12 +25,13 @@ const ContextMenuTooltip: FC<ContextMenuTooltipProps> = ({ objectId }) => {
   const sceneObject = sceneObjects[objectId]
 
   const addNewWallChild = async (type: ObjectType.WINDOW | ObjectType.DOOR) => {
-    const childUrl = type === ObjectType.WINDOW ? getDefaultWindowUrl() : getDefaultDoorUrl()
-    const model = await createWallChild(sceneObject.object as Wall, childUrl, type)
+    const child = await (type === ObjectType.WINDOW ? getDefaultWindow() : getDefaultDoor())
+    const model = await createWallChild(sceneObject.object as Wall, child.src, type)
 
     if (!model) return
 
-    const modelSize = getBufferGeometrySize(model?.geometry)
+    model.userData.id = child.id
+    const modelSize = getBufferGeometrySize(model.geometry)
     // Так как будущий элемент теперь повернут на 90 градусов, то позиция x устанавливается как z
     // Двери и окна устанавливаются на краю стены (в силу особенности используемых моделей для дверей и окон, а также геометрии стен)
     model.position.set(WALL_WIDTH / 2 + modelSize.z / 2, modelSize.y / 2 , modelSize.x / 2 + 0.1)

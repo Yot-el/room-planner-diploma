@@ -1,19 +1,9 @@
-import { Wall, Window } from '@/models/three'
-import { ThreeEvent, useGraph, useThree } from '@react-three/fiber'
+import { Wall } from '@/models/three'
+import { ThreeEvent } from '@react-three/fiber'
 import { observer } from 'mobx-react-lite'
-import { FC, useEffect, useRef } from 'react'
-import { BoxGeometry } from 'three'
+import { FC } from 'react'
 
 const ThreeWall: FC<Props> = ({ object, onClick, onContextMenu }) => {
-  const geometryRef = useRef<BoxGeometry | null>(null)
-  const { geometry } = object
-
-  useEffect(() => {
-    if (geometryRef.current) {
-      geometryRef.current.translate(0, geometry.parameters.height / 2, geometry.parameters.depth / 2)
-    }
-  }, [])
-
   return <primitive
     object={object}
     onClick={onClick}

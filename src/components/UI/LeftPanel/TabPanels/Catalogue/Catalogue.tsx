@@ -10,7 +10,6 @@ import { FC, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { CategoryItem, FurnitureItem } from '@/models/catalogue'
 import { ArrowBack, CategoryOutlined } from '@mui/icons-material'
-import { Window } from '@/models/three'
 
 const Catalogue: FC = () => {
   const {
@@ -33,13 +32,14 @@ const Catalogue: FC = () => {
   const navigate = useNavigate()
   const categoryId = params.categoryId
 
-  const loadObjectToScene = async (type: ModelType, url: string, name: string, category: string) => {
+  const loadObjectToScene = async (id: string, type: ModelType, url: string, name: string, category: string) => {
     const object = await loadModel(type, url)
 
     if (!['doors', 'windows'].includes(category)) {
       const { x, y, z } = object.position
       object.position.set(+x.toFixed(4), +y.toFixed(4), +z.toFixed(4))
       object.userData.name = name
+      object.userData.id = id
       setSceneObject(object.uuid, object, ObjectType.MODEL)
       return
     }
@@ -55,6 +55,7 @@ const Catalogue: FC = () => {
       const newChild = await createWallChild(wall, url, type)
 
       if (newChild) {
+        newChild.userData.id = id
         const windowModelSize = getBufferGeometrySize(newChild.geometry)
         // Установка новому элементу координат предыдущего
         newChild.position.set(WALL_WIDTH / 2 + windowModelSize.z / 2, previousChildPosition.y, previousChildPosition.z)
@@ -110,7 +111,7 @@ const Catalogue: FC = () => {
               () => { goToCategory(item.id) } :
               () => {
                 const furniture = item as FurnitureItem
-                loadObjectToScene(furniture.type as ModelType, furniture.src, furniture.properties.name, furniture.properties.category)
+                loadObjectToScene(furniture.id, furniture.type as ModelType, furniture.src, furniture.properties.name, furniture.properties.category)
               } }
             imageSrc={item.imageSrc ?? ''}
             name={(item as CategoryItem).category ?? ''} />
