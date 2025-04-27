@@ -9,14 +9,8 @@ export const loadModel = (type: ModelType, url: string): Promise<Object3D> => ne
     const fbxLoader = new FBXLoader()
 
     fbxLoader.load(url, (object) => {
-      console.log(object)
-      object.scale.set(0.1, 0.1, 0.1)
       resolve(object)
     })
-    break
-  }
-  case ModelType.OBJ: {
-    reject(new Error('Unsupported model type'))
     break
   }
   case ModelType.GLTF: {

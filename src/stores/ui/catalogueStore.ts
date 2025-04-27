@@ -7,7 +7,7 @@ export class CatalogueStore {
   rootStore: RootStore
 
   page = 1
-  pageCount = 10
+  pageCount = 2
   items: CatalogueItem[] = []
 
   setPage(value: number) {

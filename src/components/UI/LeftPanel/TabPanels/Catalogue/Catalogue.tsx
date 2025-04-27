@@ -50,16 +50,20 @@ const Catalogue: FC = () => {
         category === 'doors' && selectedObject.type === ObjectType.DOOR)) {
       const wall = walls[selectedObject.object.userData.wallId]
       const previousChildPosition = selectedObject.object.position
-
       const type = category === 'windows' ? ObjectType.WINDOW : ObjectType.DOOR
+      // Новый объект
       const newChild = await createWallChild(wall, url, type)
 
       if (newChild) {
         const windowModelSize = getBufferGeometrySize(newChild.geometry)
+        // Установка новому элементу координат предыдущего
         newChild.position.set(WALL_WIDTH / 2 + windowModelSize.z / 2, previousChildPosition.y, previousChildPosition.z)
+        // Обрезка позиции элемента, если он вышел за границы двери
         clampWallChildPosition(wall, newChild)
+        // Добавление нового объекта в массив существующих объектов на сцене
         setSceneObject(newChild.uuid, newChild, type)
         setSelectedObject(newChild.uuid)
+        // Удаление старого объекта
         deleteSceneObject(selectedObject.object.uuid)
       }
     }
