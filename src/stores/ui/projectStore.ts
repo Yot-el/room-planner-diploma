@@ -1,16 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { WALL_WIDTH } from '@/components/ThreeCanvas/SceneGround/SceneGround'
 import { FurnitureItem } from '@/models/catalogue'
-import { Project, ProjectItem, Properties } from '@/models/project'
+import { Project, ProjectInfo, ProjectItem, Properties } from '@/models/project'
 import { ModelType, ObjectType } from '@/models/three'
 import { RootStore } from '@/stores/rootStore'
-import { getFurniture } from '@/utils/helpers/api'
+import { getFurniture, getProjectById, saveProject } from '@/utils/helpers/api'
 import { loadModel } from '@/utils/helpers/loadModel'
 import { loadTexture } from '@/utils/helpers/loadTexture'
 import { getProjectStructure } from '@/utils/helpers/project'
 import { createWallChild, getBufferGeometrySize } from '@/utils/helpers/three'
 import { makeAutoObservable } from 'mobx'
 import { BoxGeometry, Color, Euler, EulerTuple, MathUtils, Mesh, MeshStandardMaterial, RepeatWrapping } from 'three'
-import { parameter } from 'three/tsl'
 
 export class ProjectStore {
   rootStore: RootStore
@@ -21,13 +22,13 @@ export class ProjectStore {
   async saveProject(name: string, id?: string) {
     const structure = await getProjectStructure(this.rootStore.canvasStore.sceneObjectsByType)
     const project = {
-      id: id ?? MathUtils.generateUUID(),
+      id: id,
       name,
       data: structure
     }
 
-    // TODO отправка на сервер
-    this.project = project
+    const savedProject = await saveProject(project)
+    this.project = savedProject
   }
 
   async loadModel(model: ProjectItem) {
@@ -115,7 +116,7 @@ export class ProjectStore {
     return threeWall
   }
 
-  loadProject() {
+  async loadProject(id: string) {
     const {
       canvasStore: {
         clearSceneObjects
@@ -123,8 +124,14 @@ export class ProjectStore {
     } = this.rootStore
 
     clearSceneObjects()
+    const project = await getProjectById(id)
+    const data = JSON.parse(project.data as unknown as string) as ProjectInfo
 
-    this.project?.data.forEach(async (item) => {
+    this.project = {
+      ...project,
+      data
+    }
+    data.forEach(async (item) => {
       if (item.type === ObjectType.MODEL) {
         await this.loadModel(item)
       }

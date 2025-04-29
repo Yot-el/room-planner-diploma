@@ -24,7 +24,11 @@ export type ProjectItem = {
 export type ProjectInfo = ProjectItem[]
 
 export type Project = {
-  id: string,
+  id?: string,
   name: string,
   data: ProjectInfo
 }
+
+export type ProjectResponse = { project: Required<Project> }
+
+export type ProjectListResponse = { projects: Required<Project>[] }

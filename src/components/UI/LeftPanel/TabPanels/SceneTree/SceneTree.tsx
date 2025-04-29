@@ -1,3 +1,5 @@
+import ProjectsDialog from '@/components/UI/LeftPanel/TabPanels/SceneTree/ProjectsDialog'
+import SaveProjectDialog from '@/components/UI/LeftPanel/TabPanels/SceneTree/SaveProjectDialog'
 import { useAuth } from '@/context/authContext'
 import { getDoorShortName, getModelShortName, getWallShortName, getWindowShortName } from '@/utils/helpers/helpers'
 import { useStores } from '@/utils/hooks/useStores'
@@ -18,25 +20,13 @@ const SceneTree: FC = () => {
       windowsByWallId,
       doorsByWallId,
       sceneObjects
-    },
-    projectStore: {
-      loadProject,
-      saveProject,
-      project
     }
   } = useStores()
   const navigate = useNavigate()
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [overrideProject, setOverrideProject] = useState(!!project)
-  const [projectTitle, setProjectTitle] = useState(project?.name ?? '')
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
+  const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false)
 
-  const auth = useAuth()
-  // console.log(auth)
-
-  const saveScene = () => {
-    saveProject(projectTitle)
-    setIsDialogOpen(false)
-  }
+  const { user } = useAuth()
 
   return <Stack
     spacing={1}
@@ -118,55 +108,32 @@ const SceneTree: FC = () => {
         </TreeItem>
       </SimpleTreeView>
     </Stack>
-    <Button
-      onClick={() => loadProject()}
-      variant="contained">
+    {
+      user && <>
+        <Button
+          onClick={() => setIsProjectDialogOpen(true)}
+          variant="contained">
       Загрузить сцену
-    </Button>
-    <Button
-      disabled={!Object.values(sceneObjects).length}
-      onClick={() => setIsDialogOpen(true)}
-      variant="contained">
+        </Button>
+        <Button
+          disabled={!Object.values(sceneObjects).length}
+          onClick={() => setIsSaveDialogOpen(true)}
+          variant="contained">
       Сохранить сцену
-    </Button>
+        </Button>
+      </>
+    }
     <Button
       onClick={clearSceneObjects}
       variant="contained">
       Очистить сцену
     </Button>
-    <Dialog
-      open={isDialogOpen}
-      onClose={() => setIsDialogOpen(false)}>
-      <DialogTitle>Сохранение проекта</DialogTitle>
-      <DialogContent
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          paddingTop: '16px'
-        }}>
-        <TextField
-          label="Название проекта"
-          type="text"
-          value={projectTitle}
-          onChange={(e) => setProjectTitle(e.target.value)}
-        />
-        <FormControlLabel
-          control={<Checkbox
-            checked={overrideProject}
-            disabled={!project}
-            onChange={(e, checked) => setOverrideProject(checked)} />}
-          label="Перезаписать текущий проект"
-        />
-        <Button
-          sx={{
-            marginTop: '16px'
-          }}
-          onClick={saveScene}
-          variant="contained">
-            Сохранить
-        </Button>
-      </DialogContent>
-    </Dialog>
+    <SaveProjectDialog
+      open={isSaveDialogOpen}
+      setIsOpen={setIsSaveDialogOpen} />
+    <ProjectsDialog
+      open={isProjectDialogOpen}
+      setIsOpen={setIsProjectDialogOpen} />
   </Stack>
 }
 

@@ -1,4 +1,5 @@
 import { CatalogueResponse, FurnitureItem } from '@/models/catalogue'
+import { Project, ProjectListResponse, ProjectResponse } from '@/models/project'
 import axios from 'axios'
 
 export const getBaseUrl = () => import.meta.env.APP_BASE_URL ? `http://${import.meta.env.APP_BASE_URL}` : `http://${location.hostname}:3000`
@@ -33,3 +34,27 @@ export const getPageItems = async <T,>(url: string) => {
 export const getCategoriesUrl = (page: number) => `/furnitureCategory?page=${page}&pageSize=${PAGE_SIZE}`
 
 export const getCategoryItemsUrl = (id: string, page: number) => `/furniture/category/${id}`
+
+export const saveProject = async (project: Project) => {
+  const res = await axios.post<ProjectResponse>(`${getBaseUrl()}/project/save`, project, {
+    withCredentials: true
+  })
+
+  return res.data.project
+}
+
+export const getProjectList = async () => {
+  const res = await axios.get<ProjectListResponse>(`${getBaseUrl()}/project`, {
+    withCredentials: true
+  })
+
+  return res.data.projects
+}
+
+export const getProjectById = async (id: string) => {
+  const res = await axios.get<ProjectResponse>(`${getBaseUrl()}/project/${id}`, {
+    withCredentials: true
+  })
+
+  return res.data.project
+}
